@@ -1,10 +1,5 @@
-import { type Player, type InsertPlayer, type Shot, type InsertShot, players, shots } from "@shared/schema";
-import { eq, desc, sql } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/node-postgres";
-import pg from "pg";
-
-const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
-const db = drizzle(pool);
+import { type Player, type InsertPlayer, type Shot, type InsertShot } from "@shared/schema";
+import { randomUUID } from "crypto";
 
 export interface IStorage {
   createPlayer(player: InsertPlayer): Promise<Player>;
@@ -14,44 +9,48 @@ export interface IStorage {
   getPlayerScore(playerId: string): Promise<number>;
 }
 
-export class DatabaseStorage implements IStorage {
+export class MemStorage implements IStorage {
+  private players: Map<string, Player> = new Map();
+  private shotsList: Shot[] = [];
+
   async createPlayer(player: InsertPlayer): Promise<Player> {
-    const [result] = await db.insert(players).values(player).returning();
-    return result;
+    const id = randomUUID();
+    const p: Player = { id, username: player.username, province: player.province ?? null };
+    this.players.set(id, p);
+    return p;
   }
 
   async getPlayer(id: string): Promise<Player | undefined> {
-    const [result] = await db.select().from(players).where(eq(players.id, id));
-    return result;
+    return this.players.get(id);
   }
 
   async recordShot(shot: InsertShot): Promise<Shot> {
-    const [result] = await db.insert(shots).values(shot).returning();
-    return result;
+    const id = randomUUID();
+    const s: Shot = { id, playerId: shot.playerId, power: shot.power, angle: shot.angle, isGoal: shot.isGoal, points: shot.points, createdAt: new Date() };
+    this.shotsList.push(s);
+    return s;
   }
 
   async getLeaderboard(): Promise<{ playerId: string; username: string; totalPoints: number }[]> {
-    const results = await db
-      .select({
-        playerId: players.id,
-        username: players.username,
-        totalPoints: sql<number>`COALESCE(SUM(${shots.points}), 0)::int`,
-      })
-      .from(players)
-      .leftJoin(shots, eq(players.id, shots.playerId))
-      .groupBy(players.id, players.username)
-      .orderBy(desc(sql`COALESCE(SUM(${shots.points}), 0)`))
-      .limit(10);
-    return results;
+    const scores = new Map<string, number>();
+    for (const s of this.shotsList) {
+      scores.set(s.playerId, (scores.get(s.playerId) || 0) + s.points);
+    }
+    return Array.from(scores.entries())
+      .map(([playerId, totalPoints]) => ({
+        playerId,
+        username: this.players.get(playerId)?.username || "Unknown",
+        totalPoints,
+      }))
+      .sort((a, b) => b.totalPoints - a.totalPoints)
+      .slice(0, 10);
   }
 
   async getPlayerScore(playerId: string): Promise<number> {
-    const [result] = await db
-      .select({ total: sql<number>`COALESCE(SUM(${shots.points}), 0)::int` })
-      .from(shots)
-      .where(eq(shots.playerId, playerId));
-    return result?.total ?? 0;
+    return this.shotsList
+      .filter((s) => s.playerId === playerId)
+      .reduce((sum, s) => sum + s.points, 0);
   }
 }
 
-export const storage = new DatabaseStorage();
+export const storage = new MemStorage();

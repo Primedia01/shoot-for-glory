@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 
-const stadiumBg = "/stadium-bg.png";
+const stadiumBg = "/stadium-bg.jpg";
 const soccerBall = "/soccer-ball.png";
 
 type ShotStatus = "idle" | "shooting" | "goal" | "miss";
@@ -30,13 +30,15 @@ export default function ShootForGlory() {
 
   const { data: leaderboard = [] } = useQuery<LeaderboardEntry[]>({
     queryKey: ["/api/leaderboard"],
-    refetchInterval: 3000,
+    refetchInterval: 10000,
+    staleTime: 5000,
   });
 
   const { data: playerScore } = useQuery<{ score: number }>({
     queryKey: ["/api/players", playerId, "score"],
     enabled: !!playerId,
-    refetchInterval: 3000,
+    refetchInterval: 10000,
+    staleTime: 5000,
   });
 
   const registerMutation = useMutation({

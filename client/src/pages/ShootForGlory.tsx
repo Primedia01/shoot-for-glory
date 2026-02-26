@@ -7,8 +7,8 @@ import { Input } from "@/components/ui/input";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 
-import stadiumBg from "@/assets/images/stadium-bg.png";
-import soccerBall from "@/assets/images/soccer-ball.png";
+import stadiumBg from "@assets/stadium-bg.png";
+import soccerBall from "@assets/soccer-ball.png";
 
 type ShotStatus = "idle" | "shooting" | "goal" | "miss";
 

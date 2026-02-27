@@ -247,7 +247,7 @@ export default function ShootForGlory() {
           <div className="flex justify-between items-start w-full">
             <div>
               <h2 className="font-display text-6xl text-white tracking-wider leading-none drop-shadow-lg">
-                MALL OF AFRICA <span className="text-primary block text-3xl">LIVE PENALTY ZONE</span>
+                PRIMEDIA <span className="text-primary block text-3xl">LIVE PENALTY ZONE</span>
               </h2>
             </div>
 

@@ -2,11 +2,13 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertPlayerSchema, insertShotSchema } from "@shared/schema";
+import { setupWebSocket } from "./websocket";
 
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+  setupWebSocket(httpServer);
   app.post("/api/players", async (req, res) => {
     const parsed = insertPlayerSchema.safeParse(req.body);
     if (!parsed.success) {

@@ -5,12 +5,15 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import ShootForGlory from "@/pages/ShootForGlory";
+import MobileController from "@/pages/MobileController";
+import BillboardScreen from "@/pages/BillboardScreen";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={ShootForGlory}/>
-      {/* Fallback to 404 */}
+      <Route path="/mobile" component={MobileController}/>
+      <Route path="/screen" component={BillboardScreen}/>
       <Route component={NotFound} />
     </Switch>
   );

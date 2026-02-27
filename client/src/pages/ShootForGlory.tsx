@@ -92,14 +92,31 @@ export default function ShootForGlory() {
 
       shotMutation.mutate({ power: shotPower, angle: shotAngle, isGoal: isGoal ? 1 : 0, points });
 
-      billboardBallControls.start({
-        y: -300,
-        x: info.offset.x * 1.5,
-        scale: 0.3,
-        transition: { duration: 0.4, ease: "easeOut" },
-      }).then(() => {
-        setShotStatus(isGoal ? "goal" : "miss");
-      });
+      if (isGoal) {
+        billboardBallControls.start({
+          y: -180,
+          x: info.offset.x * 0.8,
+          scale: 0.35,
+          transition: { duration: 0.45, ease: "easeOut" },
+        }).then(() => {
+          billboardBallControls.start({
+            y: -160,
+            scale: 0.3,
+            transition: { duration: 0.2, type: "spring", bounce: 0.4 },
+          });
+          setShotStatus("goal");
+        });
+      } else {
+        billboardBallControls.start({
+          y: -350,
+          x: info.offset.x * 2.5,
+          scale: 0.2,
+          opacity: 0.6,
+          transition: { duration: 0.5, ease: "easeOut" },
+        }).then(() => {
+          setShotStatus("miss");
+        });
+      }
     }
   };
 

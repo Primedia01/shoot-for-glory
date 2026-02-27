@@ -57,16 +57,35 @@ export default function BillboardScreen() {
           setLeaderboard(msg.leaderboard || []);
 
           billboardBallControls.set({ y: 0, x: 0, scale: 1, opacity: 1 });
-          billboardBallControls
-            .start({
-              y: -320,
-              x: msg.angle * 2,
-              scale: 0.25,
-              transition: { duration: 0.5, ease: "easeOut" },
-            })
-            .then(() => {
-              setShotStatus(msg.isGoal ? "goal" : "miss");
-            });
+          if (msg.isGoal) {
+            billboardBallControls
+              .start({
+                y: -220,
+                x: msg.angle * 1.2,
+                scale: 0.35,
+                transition: { duration: 0.45, ease: "easeOut" },
+              })
+              .then(() => {
+                billboardBallControls.start({
+                  y: -200,
+                  scale: 0.3,
+                  transition: { duration: 0.2, type: "spring", bounce: 0.4 },
+                });
+                setShotStatus("goal");
+              });
+          } else {
+            billboardBallControls
+              .start({
+                y: -380,
+                x: msg.angle * 3,
+                scale: 0.2,
+                opacity: 0.6,
+                transition: { duration: 0.5, ease: "easeOut" },
+              })
+              .then(() => {
+                setShotStatus("miss");
+              });
+          }
           break;
         }
       }

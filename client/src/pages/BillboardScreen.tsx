@@ -4,6 +4,9 @@ import { Trophy, Zap, Users } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { QRCodeSVG } from "qrcode.react";
 import GoalCelebration from "@/components/GoalCelebration";
+import Goalie from "@/components/Goalie";
+
+type GoalieState = "idle" | "ready" | "diving-left" | "diving-right" | "celebrate";
 
 const stadiumBg = "/stadium-bg.jpg";
 const soccerBall = "/soccer-ball.png";
@@ -23,6 +26,7 @@ export default function BillboardScreen() {
   const [playerCount, setPlayerCount] = useState(0);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [lastPoints, setLastPoints] = useState(0);
+  const [goalieState, setGoalieState] = useState<GoalieState>("idle");
   const billboardBallControls = useAnimation();
   const wsRef = useRef<WebSocket | null>(null);
 
@@ -58,7 +62,9 @@ export default function BillboardScreen() {
           setLeaderboard(msg.leaderboard || []);
 
           billboardBallControls.set({ y: 0, x: 0, scale: 1, opacity: 1 });
+          const ballGoesRight = msg.angle > 0;
           if (msg.isGoal) {
+            setGoalieState(ballGoesRight ? "diving-left" : "diving-right");
             billboardBallControls
               .start({
                 y: -220,
@@ -75,6 +81,7 @@ export default function BillboardScreen() {
                 setShotStatus("goal");
               });
           } else {
+            setGoalieState(ballGoesRight ? "diving-right" : "diving-left");
             billboardBallControls
               .start({
                 y: -380,
@@ -85,6 +92,7 @@ export default function BillboardScreen() {
               })
               .then(() => {
                 setShotStatus("miss");
+                setGoalieState("celebrate");
               });
           }
           break;
@@ -108,6 +116,7 @@ export default function BillboardScreen() {
     if (shotStatus === "goal" || shotStatus === "miss") {
       const timer = setTimeout(() => {
         setShotStatus("idle");
+        setGoalieState("idle");
         billboardBallControls.set({ y: 0, scale: 1, x: 0, opacity: 1 });
       }, 4000);
       return () => clearTimeout(timer);
@@ -212,6 +221,10 @@ export default function BillboardScreen() {
                   backgroundSize: "20px 20px",
                 }}
               />
+            </div>
+
+            <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-15">
+              <Goalie state={goalieState} scale={1.2} />
             </div>
 
             <motion.div

@@ -7,6 +7,9 @@ import { Input } from "@/components/ui/input";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import GoalCelebration from "@/components/GoalCelebration";
+import Goalie from "@/components/Goalie";
+
+type GoalieState = "idle" | "ready" | "diving-left" | "diving-right" | "celebrate";
 
 const stadiumBg = "/stadium-bg.jpg";
 const soccerBall = "/soccer-ball.png";
@@ -25,6 +28,7 @@ export default function ShootForGlory() {
   const [playerId, setPlayerId] = useState<string | null>(() => localStorage.getItem("playerId"));
   const [playerName, setPlayerName] = useState("");
   const [showRegister, setShowRegister] = useState(!playerId);
+  const [goalieState, setGoalieState] = useState<GoalieState>("idle");
 
   const queryClient = useQueryClient();
   const billboardBallControls = useAnimation();
@@ -72,6 +76,7 @@ export default function ShootForGlory() {
     if (shotStatus === "goal" || shotStatus === "miss") {
       const timer = setTimeout(() => {
         setShotStatus("idle");
+        setGoalieState("idle");
         billboardBallControls.set({ y: 0, scale: 1, x: 0, opacity: 1 });
       }, 4000);
       return () => clearTimeout(timer);
@@ -93,7 +98,9 @@ export default function ShootForGlory() {
 
       shotMutation.mutate({ power: shotPower, angle: shotAngle, isGoal: isGoal ? 1 : 0, points });
 
+      const ballGoesRight = info.offset.x > 0;
       if (isGoal) {
+        setGoalieState(ballGoesRight ? "diving-left" : "diving-right");
         billboardBallControls.start({
           y: -180,
           x: info.offset.x * 0.8,
@@ -108,6 +115,7 @@ export default function ShootForGlory() {
           setShotStatus("goal");
         });
       } else {
+        setGoalieState(ballGoesRight ? "diving-right" : "diving-left");
         billboardBallControls.start({
           y: -350,
           x: info.offset.x * 2.5,
@@ -116,6 +124,7 @@ export default function ShootForGlory() {
           transition: { duration: 0.5, ease: "easeOut" },
         }).then(() => {
           setShotStatus("miss");
+          setGoalieState("celebrate");
         });
       }
     }
@@ -305,6 +314,10 @@ export default function ShootForGlory() {
                 backgroundImage: 'linear-gradient(45deg, #fff 1px, transparent 1px), linear-gradient(-45deg, #fff 1px, transparent 1px)',
                 backgroundSize: '20px 20px'
               }} />
+            </div>
+
+            <div className="absolute bottom-14 left-1/2 -translate-x-1/2 z-15">
+              <Goalie state={goalieState} scale={1.2} />
             </div>
 
             <motion.div

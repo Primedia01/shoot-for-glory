@@ -107,7 +107,7 @@ export default function BillboardScreen() {
           <div className="flex justify-between items-start w-full">
             <div>
               <h2 className="font-display text-6xl text-white tracking-wider leading-none drop-shadow-lg">
-                MALL OF AFRICA{" "}
+                PRIMEDIA{" "}
                 <span className="text-primary block text-3xl mt-1">
                   LIVE PENALTY ZONE
                 </span>

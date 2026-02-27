@@ -3,6 +3,7 @@ import { motion, useAnimation } from "framer-motion";
 import { Trophy, Zap, Users } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { QRCodeSVG } from "qrcode.react";
+import GoalCelebration from "@/components/GoalCelebration";
 
 const stadiumBg = "/stadium-bg.jpg";
 const soccerBall = "/soccer-ball.png";
@@ -275,20 +276,39 @@ export default function BillboardScreen() {
             )}
 
             {shotStatus === "goal" && (
-              <motion.div
-                className="absolute inset-0 flex items-center justify-center pointer-events-none z-30"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-              >
-                <div className="text-center">
-                  <h1 className="font-display text-[12rem] text-primary leading-none drop-shadow-[0_0_40px_rgba(0,255,102,1)] italic">
-                    GOAL!!!
-                  </h1>
-                  <p className="font-display text-5xl text-white mt-4">
-                    @{currentShooter} +{lastPoints} POINTS
-                  </p>
-                </div>
-              </motion.div>
+              <>
+                <GoalCelebration show={true} />
+                <motion.div
+                  className="absolute inset-0 flex items-center justify-center pointer-events-none z-50"
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{ opacity: 1, scale: [0.5, 1.15, 1] }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                >
+                  <div className="text-center">
+                    <motion.h1
+                      className="font-display text-[12rem] text-primary leading-none italic"
+                      animate={{
+                        textShadow: [
+                          "0 0 40px rgba(0,255,102,1), 0 0 80px rgba(0,255,102,0.5)",
+                          "0 0 60px rgba(0,255,102,1), 0 0 120px rgba(0,255,102,0.7)",
+                          "0 0 40px rgba(0,255,102,1), 0 0 80px rgba(0,255,102,0.5)",
+                        ],
+                      }}
+                      transition={{ duration: 1, repeat: Infinity }}
+                    >
+                      GOAL!!!
+                    </motion.h1>
+                    <motion.p
+                      className="font-display text-5xl text-white mt-4"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 }}
+                    >
+                      @{currentShooter} +{lastPoints} POINTS
+                    </motion.p>
+                  </div>
+                </motion.div>
+              </>
             )}
 
             {shotStatus === "miss" && (

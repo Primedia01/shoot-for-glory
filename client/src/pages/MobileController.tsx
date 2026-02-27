@@ -4,6 +4,7 @@ import { ArrowUp, Zap, Target, User, Wifi, WifiOff } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import GoalCelebration from "@/components/GoalCelebration";
 
 const soccerBall = "/soccer-ball.png";
 
@@ -250,16 +251,37 @@ export default function MobileController() {
             </motion.div>
           )}
           {shotStatus === "goal" && (
-            <motion.div
-              initial={{ scale: 0.5, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="space-y-2"
-            >
-              <div className="font-display text-7xl text-primary drop-shadow-[0_0_20px_rgba(0,255,102,0.8)]">
-                GOAL!
-              </div>
-              <div className="font-display text-2xl text-white">+100 POINTS</div>
-            </motion.div>
+            <>
+              <GoalCelebration show={true} compact />
+              <motion.div
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: [0.5, 1.2, 1], opacity: 1 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+                className="space-y-2"
+              >
+                <motion.div
+                  className="font-display text-7xl text-primary"
+                  animate={{
+                    textShadow: [
+                      "0 0 20px rgba(0,255,102,0.8)",
+                      "0 0 40px rgba(0,255,102,1)",
+                      "0 0 20px rgba(0,255,102,0.8)",
+                    ],
+                  }}
+                  transition={{ duration: 0.8, repeat: Infinity }}
+                >
+                  GOAL!
+                </motion.div>
+                <motion.div
+                  className="font-display text-2xl text-white"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  +100 POINTS
+                </motion.div>
+              </motion.div>
+            </>
           )}
           {shotStatus === "miss" && (
             <motion.div

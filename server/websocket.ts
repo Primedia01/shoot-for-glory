@@ -2,11 +2,22 @@ import { WebSocketServer, WebSocket } from "ws";
 import { type Server } from "http";
 import { nanoid } from "nanoid";
 
+const MAX_SHOTS = 3;
+
+interface PlayerData {
+  ws: WebSocket;
+  playerName: string;
+  mobile: string;
+  province: string;
+  consent: boolean;
+  shotsUsed: number;
+  totalPoints: number;
+}
+
 interface Room {
   code: string;
   billboard: WebSocket | null;
-  mobiles: Map<string, { ws: WebSocket; playerName: string }>;
-  leaderboard: Map<string, { playerName: string; totalPoints: number }>;
+  mobiles: Map<string, PlayerData>;
 }
 
 const rooms = new Map<string, Room>();
@@ -20,18 +31,6 @@ function generateRoomCode(): string {
   return code;
 }
 
-function broadcast(room: Room, message: object, exclude?: WebSocket) {
-  const data = JSON.stringify(message);
-  if (room.billboard && room.billboard !== exclude && room.billboard.readyState === WebSocket.OPEN) {
-    room.billboard.send(data);
-  }
-  for (const [, mobile] of room.mobiles) {
-    if (mobile.ws !== exclude && mobile.ws.readyState === WebSocket.OPEN) {
-      mobile.ws.send(data);
-    }
-  }
-}
-
 function sendTo(ws: WebSocket, message: object) {
   if (ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify(message));
@@ -39,8 +38,14 @@ function sendTo(ws: WebSocket, message: object) {
 }
 
 function getLeaderboardArray(room: Room) {
-  return Array.from(room.leaderboard.entries())
-    .map(([playerId, data]) => ({ playerId, ...data }))
+  return Array.from(room.mobiles.entries())
+    .map(([playerId, data]) => ({
+      playerId,
+      playerName: data.playerName,
+      totalPoints: data.totalPoints,
+      province: data.province,
+    }))
+    .filter((e) => e.totalPoints > 0)
     .sort((a, b) => b.totalPoints - a.totalPoints)
     .slice(0, 10);
 }
@@ -69,7 +74,6 @@ export function setupWebSocket(server: Server) {
             code,
             billboard: ws,
             mobiles: new Map(),
-            leaderboard: new Map(),
           };
           rooms.set(code, room);
           currentRoom = room;
@@ -87,13 +91,24 @@ export function setupWebSocket(server: Server) {
           const playerId = nanoid(10);
           currentRoom = room;
           currentPlayerId = playerId;
-          room.mobiles.set(playerId, { ws, playerName: msg.playerName });
-          room.leaderboard.set(playerId, { playerName: msg.playerName, totalPoints: 0 });
+
+          const playerData: PlayerData = {
+            ws,
+            playerName: msg.playerName || "Player",
+            mobile: msg.mobile || "",
+            province: msg.province || "",
+            consent: msg.consent || false,
+            shotsUsed: 0,
+            totalPoints: 0,
+          };
+          room.mobiles.set(playerId, playerData);
 
           sendTo(ws, {
             type: "joined",
             playerId,
             roomCode: room.code,
+            maxShots: MAX_SHOTS,
+            shotsRemaining: MAX_SHOTS,
             leaderboard: getLeaderboardArray(room),
           });
 
@@ -101,7 +116,8 @@ export function setupWebSocket(server: Server) {
             sendTo(room.billboard, {
               type: "player_joined",
               playerId,
-              playerName: msg.playerName,
+              playerName: playerData.playerName,
+              province: playerData.province,
               playerCount: room.mobiles.size,
             });
           }
@@ -111,23 +127,34 @@ export function setupWebSocket(server: Server) {
         case "shoot": {
           if (!currentRoom || !currentPlayerId) return;
           const room = currentRoom;
-          const entry = room.leaderboard.get(currentPlayerId);
-          if (!entry) return;
+          const player = room.mobiles.get(currentPlayerId);
+          if (!player) return;
 
+          if (player.shotsUsed >= MAX_SHOTS) {
+            sendTo(ws, { type: "error", message: "You've used all your shots!" });
+            return;
+          }
+
+          player.shotsUsed++;
           const points = msg.isGoal ? 100 : 0;
-          entry.totalPoints += points;
+          player.totalPoints += points;
 
+          const shotsRemaining = MAX_SHOTS - player.shotsUsed;
           const leaderboard = getLeaderboardArray(room);
+          const isGameOver = shotsRemaining === 0;
 
           if (room.billboard) {
             sendTo(room.billboard, {
               type: "shot_fired",
               playerId: currentPlayerId,
-              playerName: entry.playerName,
+              playerName: player.playerName,
               power: msg.power,
               angle: msg.angle,
               isGoal: msg.isGoal,
               points,
+              shotNumber: player.shotsUsed,
+              maxShots: MAX_SHOTS,
+              totalScore: player.totalPoints,
               leaderboard,
             });
           }
@@ -136,9 +163,32 @@ export function setupWebSocket(server: Server) {
             type: "shot_result",
             isGoal: msg.isGoal,
             points,
-            totalScore: entry.totalPoints,
+            totalScore: player.totalPoints,
+            shotsRemaining,
+            shotNumber: player.shotsUsed,
+            maxShots: MAX_SHOTS,
             leaderboard,
           });
+
+          if (isGameOver) {
+            setTimeout(() => {
+              sendTo(ws, {
+                type: "game_over",
+                totalScore: player.totalPoints,
+                leaderboard: getLeaderboardArray(room),
+              });
+
+              if (room.billboard) {
+                sendTo(room.billboard, {
+                  type: "player_finished",
+                  playerId: currentPlayerId,
+                  playerName: player.playerName,
+                  totalScore: player.totalPoints,
+                  leaderboard: getLeaderboardArray(room),
+                });
+              }
+            }, 4500);
+          }
 
           for (const [pid, mobile] of room.mobiles) {
             if (pid !== currentPlayerId) {

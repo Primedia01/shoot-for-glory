@@ -16,22 +16,37 @@ Interactive web-based prototypes simulating mobile-to-screen synchronization for
 | `/screen` | Billboard display — shows on the big screen, generates QR code |
 | `/mobile` | Mobile controller — opened on phone, swipe-to-shoot interface |
 
-## Two-Device Sync Flow
-1. Open `/screen` on the billboard display — it creates a WebSocket room and shows a QR code
-2. Scan QR code (or open `/mobile?room=XXXX`) on your phone
-3. Enter your name and join the game
-4. Swipe up on the phone to shoot — the ball animates on the billboard in real-time
-5. Leaderboard updates live on both screens
+## User Journey (Mobile)
+1. **Scan** — Shopper scans QR code on billboard screen
+2. **Register** — Enter name, mobile number, province (dropdown), optional consent opt-in
+3. **Play** — 3 swipe attempts; direction + speed determines trajectory; AI goalkeeper responds
+4. **Live Screen** — Player name appears on billboard; shot animation synced live; score on leaderboard
+5. **Game Over** — Final score, leaderboard rank, prize messaging
+6. **Win** — Highest score in 2-hour prize window wins grand prize; spot prizes during activation
+
+## WebSocket Protocol
+- Billboard sends `create_room` → receives `room_created` with roomCode
+- Mobile sends `join_room` with playerName, mobile, province, consent → receives `joined` with maxShots=3
+- Mobile sends `shoot` → receives `shot_result` with shotsRemaining, shotNumber, totalScore
+- After 3rd shot, server sends `game_over` to mobile and `player_finished` to billboard
+- Server enforces MAX_SHOTS=3 per player
 
 ## Key Files
 - `client/src/pages/ShootForGlory.tsx` — Original split-screen prototype
-- `client/src/pages/MobileController.tsx` — Phone swipe interface
-- `client/src/pages/BillboardScreen.tsx` — Billboard with QR code + goal animations
-- `server/websocket.ts` — WebSocket room manager (create/join/shoot protocol)
+- `client/src/pages/MobileController.tsx` — Phone: registration → 3-shot game → game over
+- `client/src/pages/BillboardScreen.tsx` — Billboard with QR code, branding zones, shot tracking
+- `client/src/components/GoalCelebration.tsx` — Confetti + ring burst animation
+- `client/src/components/Goalie.tsx` — Virtual goalkeeper with diving animations
+- `server/websocket.ts` — WebSocket room manager with 3-shot mechanic
 - `server/routes.ts` — REST API endpoints + WebSocket setup
 - `server/storage.ts` — In-memory storage for players/shots/leaderboard
 - `shared/schema.ts` — Drizzle schema (players, shots tables)
 - `client/src/index.css` — Neon Arena theme (dark + green neon accents)
+
+## Billboard Branding Zones
+- Top-left: Sponsor logo placeholder ("YOUR LOGO")
+- Bottom bar: Sponsored by placeholder ("YOUR BRAND")
+- Prize messaging: 2-hour window, grand prize, spot prizes
 
 ## Theme: Neon Arena
 - Dark stadium background with neon green (#00ff66) accents

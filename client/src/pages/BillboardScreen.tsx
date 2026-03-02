@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion, useAnimation } from "framer-motion";
-import { Trophy, Zap, Users } from "lucide-react";
+import { Trophy, Zap, Users, Clock, Gift } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { QRCodeSVG } from "qrcode.react";
 import GoalCelebration from "@/components/GoalCelebration";
@@ -17,6 +17,7 @@ interface LeaderboardEntry {
   playerId: string;
   playerName: string;
   totalPoints: number;
+  province: string;
 }
 
 export default function BillboardScreen() {
@@ -27,6 +28,7 @@ export default function BillboardScreen() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [lastPoints, setLastPoints] = useState(0);
   const [goalieState, setGoalieState] = useState<GoalieState>("idle");
+  const [shotInfo, setShotInfo] = useState({ shotNumber: 0, maxShots: 3, totalScore: 0 });
   const billboardBallControls = useAnimation();
   const wsRef = useRef<WebSocket | null>(null);
 
@@ -55,10 +57,14 @@ export default function BillboardScreen() {
         case "player_left":
           setPlayerCount(msg.playerCount);
           break;
+        case "player_finished":
+          setLeaderboard(msg.leaderboard || []);
+          break;
         case "shot_fired": {
           setCurrentShooter(msg.playerName);
           setShotStatus("shooting");
           setLastPoints(msg.points);
+          setShotInfo({ shotNumber: msg.shotNumber, maxShots: msg.maxShots, totalScore: msg.totalScore });
           setLeaderboard(msg.leaderboard || []);
 
           billboardBallControls.set({ y: 0, x: 0, scale: 1, opacity: 1 });
@@ -132,76 +138,96 @@ export default function BillboardScreen() {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-black/90" />
 
-        <div className="absolute inset-0 flex flex-col p-10 z-10">
-          <div className="flex justify-between items-start w-full">
-            <div>
-              <h2 className="font-display text-6xl text-white tracking-wider leading-none drop-shadow-lg">
-                PRIMEDIA{" "}
-                <span className="text-primary block text-3xl mt-1">
-                  LIVE PENALTY ZONE
-                </span>
-              </h2>
-              {playerCount > 0 && (
-                <div className="flex items-center gap-2 mt-3 text-neutral-300">
-                  <Users className="w-5 h-5 text-primary" />
-                  <span className="font-display text-xl tracking-wider">
-                    {playerCount} PLAYER{playerCount !== 1 ? "S" : ""} CONNECTED
-                  </span>
+        <div className="absolute inset-0 flex flex-col z-10">
+          <div className="flex justify-between items-start p-8 pb-4">
+            <div className="flex-1">
+              <div className="flex items-start gap-6">
+                <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-6 py-4 flex flex-col items-center justify-center min-w-[140px]">
+                  <span className="text-neutral-400 text-[10px] tracking-widest uppercase mb-1">Presented by</span>
+                  <div className="font-display text-3xl text-white tracking-wider">YOUR LOGO</div>
                 </div>
-              )}
+
+                <div>
+                  <h2 className="font-display text-5xl text-white tracking-wider leading-none drop-shadow-lg">
+                    SHOOT FOR GLORY
+                  </h2>
+                  <span className="text-primary font-display text-2xl tracking-wider mt-1 block">
+                    LIVE PENALTY ZONE
+                  </span>
+                  <div className="flex items-center gap-4 mt-2">
+                    {playerCount > 0 && (
+                      <div className="flex items-center gap-1.5 text-neutral-300">
+                        <Users className="w-4 h-4 text-primary" />
+                        <span className="font-display text-base tracking-wider">
+                          {playerCount} PLAYER{playerCount !== 1 ? "S" : ""}
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-1.5 text-neutral-300">
+                      <Gift className="w-4 h-4 text-yellow-400" />
+                      <span className="font-display text-base tracking-wider text-yellow-400">
+                        PRIZES TO BE WON
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex gap-3">
               {roomCode && (
-                <Card className="bg-white p-4 border-none flex flex-col items-center">
+                <Card className="bg-white p-3 border-none flex flex-col items-center">
                   <QRCodeSVG
                     value={mobileUrl}
-                    size={160}
+                    size={130}
                     level="M"
                     bgColor="#ffffff"
                     fgColor="#000000"
                   />
-                  <div className="mt-2 text-center">
-                    <p className="text-black font-display text-lg tracking-widest">
+                  <div className="mt-1.5 text-center">
+                    <p className="text-black font-display text-sm tracking-widest">
                       SCAN TO PLAY
                     </p>
-                    <p className="text-neutral-500 font-display text-3xl tracking-[0.4em]">
+                    <p className="text-neutral-500 font-display text-2xl tracking-[0.4em]">
                       {roomCode}
                     </p>
                   </div>
                 </Card>
               )}
 
-              <Card className="bg-black/60 backdrop-blur-md border-neutral-800 p-6 min-w-[280px]">
-                <div className="flex items-center gap-3 mb-4 text-primary">
-                  <Trophy className="w-6 h-6" />
+              <Card className="bg-black/60 backdrop-blur-md border-neutral-800 p-4 min-w-[250px] max-h-[320px] overflow-hidden">
+                <div className="flex items-center gap-2 mb-3 text-primary">
+                  <Trophy className="w-5 h-5" />
                   <h3
                     data-testid="text-billboard-leaderboard-title"
-                    className="font-display text-2xl tracking-widest"
+                    className="font-display text-xl tracking-widest"
                   >
                     LEADERBOARD
                   </h3>
                 </div>
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {leaderboard.length === 0 && (
-                    <p className="text-neutral-500 text-sm text-center py-4">
-                      Scan the QR code to be the first!
+                    <p className="text-neutral-500 text-sm text-center py-3">
+                      Scan QR to be first!
                     </p>
                   )}
                   {leaderboard.slice(0, 5).map((entry, i) => (
                     <div
                       key={entry.playerId}
                       data-testid={`row-billboard-leaderboard-${i}`}
-                      className={`flex justify-between items-center px-4 py-2 rounded ${
+                      className={`flex justify-between items-center px-3 py-1.5 rounded text-sm ${
                         i === 0
                           ? "bg-yellow-500/20 text-yellow-400"
                           : "bg-white/10 text-white"
                       }`}
                     >
-                      <span className="font-bold truncate mr-2">
-                        {i + 1}. @{entry.playerName}
-                      </span>
-                      <span className="font-display text-2xl flex-shrink-0">
+                      <div className="truncate mr-2">
+                        <span className="font-bold">{i + 1}. {entry.playerName}</span>
+                        {entry.province && (
+                          <span className="text-neutral-500 text-xs ml-1">({entry.province})</span>
+                        )}
+                      </div>
+                      <span className="font-display text-xl flex-shrink-0">
                         {entry.totalPoints}
                       </span>
                     </div>
@@ -211,8 +237,8 @@ export default function BillboardScreen() {
             </div>
           </div>
 
-          <div className="flex-1 flex flex-col items-center justify-end pb-16 relative">
-            <div className="absolute bottom-8 w-[800px] h-[350px] border-t-8 border-x-8 border-white/80 rounded-t-lg shadow-[0_0_30px_rgba(255,255,255,0.2)]">
+          <div className="flex-1 flex flex-col items-center justify-end pb-12 relative">
+            <div className="absolute bottom-6 w-[800px] h-[330px] border-t-8 border-x-8 border-white/80 rounded-t-lg shadow-[0_0_30px_rgba(255,255,255,0.2)]">
               <div
                 className="w-full h-full opacity-30"
                 style={{
@@ -223,7 +249,7 @@ export default function BillboardScreen() {
               />
             </div>
 
-            <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-15">
+            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-15">
               <Goalie state={goalieState} scale={1.2} />
             </div>
 
@@ -257,7 +283,10 @@ export default function BillboardScreen() {
                     SCAN TO PLAY
                   </h1>
                   <p className="text-primary text-2xl font-bold tracking-widest mt-2">
-                    USE YOUR PHONE TO TAKE A PENALTY
+                    3 SHOTS TO SCORE BIG
+                  </p>
+                  <p className="text-yellow-400 text-lg font-display tracking-wider mt-2">
+                    WIN PRIZES EVERY 2 HOURS
                   </p>
                 </div>
               </div>
@@ -278,12 +307,12 @@ export default function BillboardScreen() {
 
             {shotStatus === "shooting" && (
               <motion.div
-                className="absolute top-8 left-0 right-0 text-center pointer-events-none z-30"
+                className="absolute top-4 left-0 right-0 text-center pointer-events-none z-30"
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
               >
-                <p className="font-display text-4xl text-yellow-400">
-                  @{currentShooter} IS SHOOTING...
+                <p className="font-display text-3xl text-yellow-400">
+                  {currentShooter} — SHOT {shotInfo.shotNumber} OF {shotInfo.maxShots}
                 </p>
               </motion.div>
             )}
@@ -312,12 +341,12 @@ export default function BillboardScreen() {
                       GOAL!!!
                     </motion.h1>
                     <motion.p
-                      className="font-display text-5xl text-white mt-4"
+                      className="font-display text-4xl text-white mt-2"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.3 }}
                     >
-                      @{currentShooter} +{lastPoints} POINTS
+                      {currentShooter} — {shotInfo.totalScore} PTS (Shot {shotInfo.shotNumber}/{shotInfo.maxShots})
                     </motion.p>
                   </div>
                 </motion.div>
@@ -334,12 +363,28 @@ export default function BillboardScreen() {
                   <h1 className="font-display text-[10rem] text-destructive leading-none drop-shadow-[0_0_40px_rgba(255,0,0,0.8)] italic">
                     SAVED
                   </h1>
-                  <p className="font-display text-4xl text-neutral-300 mt-4">
-                    @{currentShooter} — NICE TRY!
+                  <p className="font-display text-3xl text-neutral-300 mt-2">
+                    {currentShooter} — Shot {shotInfo.shotNumber}/{shotInfo.maxShots}
                   </p>
                 </div>
               </motion.div>
             )}
+          </div>
+
+          <div className="px-8 pb-4">
+            <div className="bg-black/40 backdrop-blur-sm rounded-xl px-6 py-2 border border-neutral-800 flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-yellow-400" />
+                <span className="text-neutral-400 text-sm font-display tracking-wider">2-HOUR PRIZE WINDOW</span>
+              </div>
+              <div className="text-neutral-500 text-xs">
+                Highest score wins grand prize • Spot prizes during activation
+              </div>
+              <div className="bg-white/10 rounded-lg px-4 py-1 border border-white/10">
+                <span className="text-neutral-400 text-[10px] tracking-widest uppercase">Sponsored by</span>
+                <span className="text-white font-display text-sm ml-2 tracking-wider">YOUR BRAND</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

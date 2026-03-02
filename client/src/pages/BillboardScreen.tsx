@@ -249,8 +249,8 @@ export default function BillboardScreen() {
               />
             </div>
 
-            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-15">
-              <Goalie state={goalieState} scale={1.8} jerseyText="YOUR BRAND" />
+            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[5]">
+              <Goalie state={goalieState} scale={1.4} jerseyText="YOUR BRAND" />
             </div>
 
             <motion.div
@@ -268,7 +268,7 @@ export default function BillboardScreen() {
             </motion.div>
 
             {shotStatus === "idle" && !roomCode && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[10]">
                 <div className="bg-black/80 backdrop-blur-sm border-2 border-primary px-8 py-6 rounded-2xl flex flex-col items-center text-center">
                   <Zap className="w-12 h-12 text-primary fill-primary mb-4" />
                   <h1 className="font-display text-5xl text-white">CONNECTING...</h1>
@@ -277,7 +277,7 @@ export default function BillboardScreen() {
             )}
 
             {shotStatus === "idle" && roomCode && playerCount === 0 && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[10]">
                 <div className="bg-black/80 backdrop-blur-sm border-2 border-primary px-8 py-6 rounded-2xl flex flex-col items-center text-center animate-pulse">
                   <h1 className="font-display text-7xl text-white">
                     SCAN TO PLAY
@@ -293,7 +293,7 @@ export default function BillboardScreen() {
             )}
 
             {shotStatus === "idle" && roomCode && playerCount > 0 && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[10]">
                 <div className="bg-black/80 backdrop-blur-sm border-2 border-primary px-6 py-4 rounded-2xl flex flex-col items-center text-center">
                   <h1 className="font-display text-6xl text-white">
                     WAITING FOR SHOT...

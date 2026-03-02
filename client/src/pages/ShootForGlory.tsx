@@ -316,8 +316,8 @@ export default function ShootForGlory() {
               }} />
             </div>
 
-            <div className="absolute bottom-14 left-1/2 -translate-x-1/2 z-15">
-              <Goalie state={goalieState} scale={1.8} jerseyText="YOUR BRAND" />
+            <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-[5]">
+              <Goalie state={goalieState} scale={1.4} jerseyText="YOUR BRAND" />
             </div>
 
             <motion.div
@@ -331,7 +331,7 @@ export default function ShootForGlory() {
             </motion.div>
 
             {shotStatus === "idle" && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[10]">
                 <div className="bg-black/80 backdrop-blur-sm border-2 border-primary px-8 py-6 rounded-2xl flex flex-col items-center text-center animate-pulse">
                   <h1 className="font-display text-7xl text-white">SCAN TO PLAY</h1>
                   <p className="text-primary text-2xl font-bold tracking-widest mt-2">QR CODE OR CONNECT DEVICE</p>

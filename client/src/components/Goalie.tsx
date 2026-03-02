@@ -81,10 +81,10 @@ export default function Goalie({
     <motion.div
       className="relative"
       animate={bodyControls}
-      style={{ width: 120 * scale, height: 200 * scale }}
+      style={{ width: 120 * scale, height: 170 * scale }}
     >
       <svg
-        viewBox="0 0 120 200"
+        viewBox="0 0 120 170"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         className="w-full h-full"

@@ -317,7 +317,7 @@ export default function ShootForGlory() {
             </div>
 
             <div className="absolute bottom-14 left-1/2 -translate-x-1/2 z-15">
-              <Goalie state={goalieState} scale={1.2} />
+              <Goalie state={goalieState} scale={1.8} jerseyText="YOUR BRAND" />
             </div>
 
             <motion.div

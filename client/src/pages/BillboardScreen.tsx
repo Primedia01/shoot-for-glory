@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { motion, useAnimation } from "framer-motion";
-import { Trophy, Zap, Users, Clock, Gift } from "lucide-react";
-import { Card } from "@/components/ui/card";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { motion, useAnimation, AnimatePresence } from "framer-motion";
+import { Trophy, Users, Gift } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import GoalCelebration from "@/components/GoalCelebration";
 import Goalie from "@/components/Goalie";
@@ -130,264 +129,388 @@ export default function BillboardScreen() {
   }, [shotStatus, billboardBallControls]);
 
   return (
-    <div className="flex h-screen w-full bg-black text-white overflow-hidden">
-      <div className="flex-1 relative bg-neutral-900 overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-60"
-          style={{ backgroundImage: `url(${stadiumBg})` }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-black/90" />
+    <div className="h-screen w-full text-white overflow-hidden relative fifa-gradient-bg">
+      <div
+        className="absolute inset-0 bg-cover bg-center opacity-30"
+        style={{ backgroundImage: `url(${stadiumBg})` }}
+      />
 
-        <div className="absolute inset-0 flex flex-col z-10">
-          <div className="flex justify-between items-start p-8 pb-4">
-            <div className="flex-1">
-              <div className="flex items-start gap-6">
-                <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-6 py-4 flex flex-col items-center justify-center min-w-[140px]">
-                  <span className="text-neutral-400 text-[10px] tracking-widest uppercase mb-1">Presented by</span>
-                  <div className="font-display text-3xl text-white tracking-wider">YOUR LOGO</div>
-                </div>
+      <div className="absolute inset-0 pointer-events-none" style={{
+        background: "radial-gradient(ellipse at 50% 120%, rgba(212,168,67,0.08) 0%, transparent 60%)"
+      }} />
+      <div className="absolute inset-0 pointer-events-none" style={{
+        background: "linear-gradient(180deg, rgba(86,4,44,0.6) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.8) 100%)"
+      }} />
 
+      <div className="absolute top-0 left-0 right-0 h-[3px] z-50" style={{
+        background: "linear-gradient(90deg, transparent, #D4A843 20%, #F5D780 50%, #D4A843 80%, transparent)"
+      }} />
+
+      <div className="absolute inset-0 flex flex-col z-10">
+
+        <div className="flex justify-between items-start px-10 pt-6 pb-2">
+          <div className="flex items-center gap-8">
+            <div className="flex flex-col items-start">
+              <div className="flex items-center gap-3 mb-1">
+                <svg viewBox="0 0 40 40" className="w-12 h-12" fill="none">
+                  <circle cx="20" cy="20" r="18" stroke="#D4A843" strokeWidth="2" fill="none" />
+                  <circle cx="20" cy="20" r="14" stroke="#D4A843" strokeWidth="1" fill="none" opacity="0.4" />
+                  <path d="M20 6 L20 14 M20 26 L20 34 M6 20 L14 20 M26 20 L34 20" stroke="#D4A843" strokeWidth="1.5" opacity="0.6" />
+                  <circle cx="20" cy="20" r="5" fill="#D4A843" opacity="0.3" />
+                </svg>
                 <div>
-                  <h2 className="font-display text-5xl text-white tracking-wider leading-none drop-shadow-lg">
-                    SHOOT FOR GLORY
-                  </h2>
-                  <span className="text-primary font-display text-2xl tracking-wider mt-1 block">
-                    LIVE PENALTY ZONE
-                  </span>
-                  <div className="flex items-center gap-4 mt-2">
-                    {playerCount > 0 && (
-                      <div className="flex items-center gap-1.5 text-neutral-300">
-                        <Users className="w-4 h-4 text-primary" />
-                        <span className="font-display text-base tracking-wider">
-                          {playerCount} PLAYER{playerCount !== 1 ? "S" : ""}
-                        </span>
-                      </div>
-                    )}
-                    <div className="flex items-center gap-1.5 text-neutral-300">
-                      <Gift className="w-4 h-4 text-yellow-400" />
-                      <span className="font-display text-base tracking-wider text-yellow-400">
-                        PRIZES TO BE WON
-                      </span>
-                    </div>
-                  </div>
+                  <p className="text-[#D4A843] text-xs tracking-[0.4em] uppercase" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+                    FIFA WORLD CUP
+                  </p>
+                  <p className="text-white text-3xl leading-none tracking-[0.15em]" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+                    USA | MEX | CAN 2026
+                  </p>
                 </div>
               </div>
             </div>
 
-            <div className="flex gap-3">
-              {roomCode && (
-                <Card className="bg-white p-3 border-none flex flex-col items-center">
+            <div className="h-14 w-px bg-gradient-to-b from-transparent via-[#D4A843]/40 to-transparent" />
+
+            <div>
+              <h1 className="text-6xl text-white leading-none tracking-[0.05em]" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+                SHOOT FOR <span className="fifa-gradient-text">GLORY</span>
+              </h1>
+              <div className="flex items-center gap-4 mt-1">
+                <span className="text-[#D4A843] text-lg tracking-[0.3em] uppercase" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+                  LIVE PENALTY CHALLENGE
+                </span>
+                {playerCount > 0 && (
+                  <>
+                    <div className="w-1 h-1 rounded-full bg-[#D4A843]" />
+                    <div className="flex items-center gap-1.5">
+                      <Users className="w-4 h-4 text-[#D4A843]" />
+                      <span className="text-white/70 text-sm tracking-wider" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+                        {playerCount} PLAYER{playerCount !== 1 ? "S" : ""} LIVE
+                      </span>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-4">
+            {roomCode && (
+              <div className="relative animate-pulse-glow rounded-2xl">
+                <div className="bg-white rounded-2xl p-4 flex flex-col items-center">
                   <QRCodeSVG
                     value={mobileUrl}
-                    size={130}
+                    size={150}
                     level="M"
                     bgColor="#ffffff"
-                    fgColor="#000000"
+                    fgColor="#1a0610"
                   />
-                  <div className="mt-1.5 text-center">
-                    <p className="text-black font-display text-sm tracking-widest">
+                  <div className="mt-2 text-center">
+                    <p className="text-[#56042C] text-sm tracking-[0.3em] font-bold" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
                       SCAN TO PLAY
                     </p>
-                    <p className="text-neutral-500 font-display text-2xl tracking-[0.4em]">
+                    <p className="text-neutral-600 text-2xl tracking-[0.5em] font-bold" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
                       {roomCode}
                     </p>
                   </div>
-                </Card>
-              )}
-
-              <Card className="bg-black/60 backdrop-blur-md border-neutral-800 p-4 min-w-[250px] max-h-[320px] overflow-hidden">
-                <div className="flex items-center gap-2 mb-3 text-primary">
-                  <Trophy className="w-5 h-5" />
-                  <h3
-                    data-testid="text-billboard-leaderboard-title"
-                    className="font-display text-xl tracking-widest"
-                  >
-                    LEADERBOARD
-                  </h3>
-                </div>
-                <div className="space-y-2">
-                  {leaderboard.length === 0 && (
-                    <p className="text-neutral-500 text-sm text-center py-3">
-                      Scan QR to be first!
-                    </p>
-                  )}
-                  {leaderboard.slice(0, 5).map((entry, i) => (
-                    <div
-                      key={entry.playerId}
-                      data-testid={`row-billboard-leaderboard-${i}`}
-                      className={`flex justify-between items-center px-3 py-1.5 rounded text-sm ${
-                        i === 0
-                          ? "bg-yellow-500/20 text-yellow-400"
-                          : "bg-white/10 text-white"
-                      }`}
-                    >
-                      <div className="truncate mr-2">
-                        <span className="font-bold">{i + 1}. {entry.playerName}</span>
-                        {entry.province && (
-                          <span className="text-neutral-500 text-xs ml-1">({entry.province})</span>
-                        )}
-                      </div>
-                      <span className="font-display text-xl flex-shrink-0">
-                        {entry.totalPoints}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            </div>
-          </div>
-
-          <div className="flex-1 flex flex-col items-center justify-end pb-12 relative">
-            <div className="absolute bottom-6 w-[800px] h-[330px] border-t-8 border-x-8 border-white/80 rounded-t-lg shadow-[0_0_30px_rgba(255,255,255,0.2)]">
-              <div
-                className="w-full h-full opacity-30"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(45deg, #fff 1px, transparent 1px), linear-gradient(-45deg, #fff 1px, transparent 1px)",
-                  backgroundSize: "20px 20px",
-                }}
-              />
-            </div>
-
-            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[5]">
-              <Goalie state={goalieState} scale={1.4} jerseyText="YOUR BRAND" />
-            </div>
-
-            <motion.div
-              className="relative z-20 w-32 h-32"
-              initial={{ y: 0, scale: 1, opacity: 1 }}
-              animate={billboardBallControls}
-            >
-              {shotStatus !== "idle" && (
-                <img
-                  src={soccerBall}
-                  alt="Ball"
-                  className="w-full h-full object-contain"
-                />
-              )}
-            </motion.div>
-
-            {shotStatus === "idle" && !roomCode && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[10]">
-                <div className="bg-black/80 backdrop-blur-sm border-2 border-primary px-8 py-6 rounded-2xl flex flex-col items-center text-center">
-                  <Zap className="w-12 h-12 text-primary fill-primary mb-4" />
-                  <h1 className="font-display text-5xl text-white">CONNECTING...</h1>
                 </div>
               </div>
+            )}
+
+            <div className="bg-black/40 backdrop-blur-md border border-[#D4A843]/20 rounded-2xl p-5 min-w-[280px] max-h-[340px]">
+              <div className="flex items-center gap-2 mb-3">
+                <Trophy className="w-5 h-5 text-[#D4A843]" />
+                <h3
+                  data-testid="text-billboard-leaderboard-title"
+                  className="text-xl tracking-[0.25em] text-[#D4A843]"
+                  style={{ fontFamily: "'Bebas Neue', sans-serif" }}
+                >
+                  LEADERBOARD
+                </h3>
+              </div>
+              <div className="space-y-2">
+                {leaderboard.length === 0 && (
+                  <p className="text-white/30 text-sm text-center py-6 tracking-wider">
+                    Scan QR code to be first!
+                  </p>
+                )}
+                {leaderboard.slice(0, 5).map((entry, i) => (
+                  <motion.div
+                    key={entry.playerId}
+                    data-testid={`row-billboard-leaderboard-${i}`}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    className={`flex justify-between items-center px-4 py-2 rounded-lg ${
+                      i === 0
+                        ? "bg-gradient-to-r from-[#D4A843]/30 to-transparent border border-[#D4A843]/30 text-[#D4A843]"
+                        : "bg-white/5 text-white/80"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 truncate mr-2">
+                      <span className="text-lg font-bold" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+                        {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}.`}
+                      </span>
+                      <div className="truncate">
+                        <span className="font-semibold text-sm">{entry.playerName}</span>
+                        {entry.province && (
+                          <span className="text-white/30 text-xs ml-1.5">• {entry.province}</span>
+                        )}
+                      </div>
+                    </div>
+                    <span className="text-2xl flex-shrink-0" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+                      {entry.totalPoints}
+                    </span>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex-1 flex flex-col items-center justify-end pb-16 relative">
+          <div className="absolute bottom-8 w-[850px] h-[340px] rounded-t-xl overflow-hidden">
+            <div className="absolute inset-0 border-t-[6px] border-x-[6px] border-white/60 rounded-t-xl z-[2]" />
+            <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent" />
+            <div
+              className="w-full h-full opacity-20"
+              style={{
+                backgroundImage:
+                  "linear-gradient(45deg, #fff 1px, transparent 1px), linear-gradient(-45deg, #fff 1px, transparent 1px)",
+                backgroundSize: "24px 24px",
+              }}
+            />
+            <div className="absolute bottom-0 left-0 right-0 h-2 bg-white/10" />
+          </div>
+
+          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-[5]">
+            <Goalie state={goalieState} scale={1.4} jerseyColor="#56042C" jerseyAccent="#3a0220" jerseyText="SPONSOR" />
+          </div>
+
+          <motion.div
+            className="relative z-20 w-36 h-36"
+            initial={{ y: 0, scale: 1, opacity: 1 }}
+            animate={billboardBallControls}
+          >
+            {shotStatus !== "idle" && (
+              <img
+                src={soccerBall}
+                alt="Ball"
+                className="w-full h-full object-contain"
+              />
+            )}
+          </motion.div>
+
+          <AnimatePresence mode="wait">
+            {shotStatus === "idle" && !roomCode && (
+              <motion.div
+                key="connecting"
+                className="absolute inset-0 flex items-center justify-center pointer-events-none z-[10]"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <div className="text-center">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                    className="w-16 h-16 border-2 border-[#D4A843]/30 border-t-[#D4A843] rounded-full mx-auto mb-6"
+                  />
+                  <h1 className="text-6xl text-white tracking-[0.15em]" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+                    CONNECTING
+                  </h1>
+                </div>
+              </motion.div>
             )}
 
             {shotStatus === "idle" && roomCode && playerCount === 0 && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[10]">
-                <div className="bg-black/80 backdrop-blur-sm border-2 border-primary px-8 py-6 rounded-2xl flex flex-col items-center text-center animate-pulse">
-                  <h1 className="font-display text-7xl text-white">
-                    SCAN TO PLAY
-                  </h1>
-                  <p className="text-primary text-2xl font-bold tracking-widest mt-2">
-                    3 SHOTS TO SCORE BIG
-                  </p>
-                  <p className="text-yellow-400 text-lg font-display tracking-wider mt-2">
-                    WIN PRIZES EVERY 2 HOURS
-                  </p>
+              <motion.div
+                key="scan"
+                className="absolute inset-0 flex items-center justify-center pointer-events-none z-[10]"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <div className="text-center max-w-2xl">
+                  <motion.h1
+                    className="text-[8rem] leading-none tracking-[0.05em] text-white"
+                    style={{ fontFamily: "'Bebas Neue', sans-serif" }}
+                    animate={{ opacity: [0.7, 1, 0.7] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    SCAN TO <span className="fifa-gradient-text">PLAY</span>
+                  </motion.h1>
+                  <div className="flex items-center justify-center gap-6 mt-4">
+                    <div className="h-px flex-1 bg-gradient-to-r from-transparent to-[#D4A843]/40" />
+                    <p className="text-[#D4A843] text-2xl tracking-[0.3em]" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+                      3 SHOTS TO WIN
+                    </p>
+                    <div className="h-px flex-1 bg-gradient-to-l from-transparent to-[#D4A843]/40" />
+                  </div>
+                  <motion.p
+                    className="text-white/40 text-xl tracking-[0.2em] mt-3"
+                    style={{ fontFamily: "'Bebas Neue', sans-serif" }}
+                    animate={{ opacity: [0.3, 0.6, 0.3] }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                  >
+                    PRIZES AWARDED EVERY 2 HOURS
+                  </motion.p>
                 </div>
-              </div>
+              </motion.div>
             )}
 
             {shotStatus === "idle" && roomCode && playerCount > 0 && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[10]">
-                <div className="bg-black/80 backdrop-blur-sm border-2 border-primary px-6 py-4 rounded-2xl flex flex-col items-center text-center">
-                  <h1 className="font-display text-6xl text-white">
-                    WAITING FOR SHOT...
+              <motion.div
+                key="waiting"
+                className="absolute inset-0 flex items-center justify-center pointer-events-none z-[10]"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <div className="text-center">
+                  <motion.div
+                    className="flex items-center justify-center gap-3 mb-4"
+                    animate={{ opacity: [0.5, 1, 0.5] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                  >
+                    <div className="w-3 h-3 rounded-full bg-primary" />
+                    <div className="w-3 h-3 rounded-full bg-primary" style={{ animationDelay: "0.3s" }} />
+                    <div className="w-3 h-3 rounded-full bg-primary" style={{ animationDelay: "0.6s" }} />
+                  </motion.div>
+                  <h1 className="text-7xl text-white tracking-[0.1em]" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+                    WAITING FOR SHOT
                   </h1>
-                  <p className="text-primary text-xl font-bold tracking-widest mt-2">
+                  <p className="text-[#D4A843] text-2xl tracking-[0.3em] mt-2" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
                     SWIPE UP ON YOUR PHONE
                   </p>
                 </div>
-              </div>
-            )}
-
-            {shotStatus === "shooting" && (
-              <motion.div
-                className="absolute top-4 left-0 right-0 text-center pointer-events-none z-30"
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
-                <p className="font-display text-3xl text-yellow-400">
-                  {currentShooter} — SHOT {shotInfo.shotNumber} OF {shotInfo.maxShots}
-                </p>
               </motion.div>
             )}
+          </AnimatePresence>
 
-            {shotStatus === "goal" && (
-              <>
-                <GoalCelebration show={true} />
-                <motion.div
-                  className="absolute inset-0 flex items-center justify-center pointer-events-none z-50"
-                  initial={{ opacity: 0, scale: 0.5 }}
-                  animate={{ opacity: 1, scale: [0.5, 1.15, 1] }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
-                >
-                  <div className="text-center">
-                    <motion.h1
-                      className="font-display text-[12rem] text-primary leading-none italic"
-                      animate={{
-                        textShadow: [
-                          "0 0 40px rgba(0,255,102,1), 0 0 80px rgba(0,255,102,0.5)",
-                          "0 0 60px rgba(0,255,102,1), 0 0 120px rgba(0,255,102,0.7)",
-                          "0 0 40px rgba(0,255,102,1), 0 0 80px rgba(0,255,102,0.5)",
-                        ],
-                      }}
-                      transition={{ duration: 1, repeat: Infinity }}
-                    >
-                      GOAL!!!
-                    </motion.h1>
-                    <motion.p
-                      className="font-display text-4xl text-white mt-2"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.3 }}
-                    >
-                      {currentShooter} — {shotInfo.totalScore} PTS (Shot {shotInfo.shotNumber}/{shotInfo.maxShots})
-                    </motion.p>
-                  </div>
-                </motion.div>
-              </>
-            )}
+          {shotStatus === "shooting" && (
+            <motion.div
+              className="absolute top-2 left-0 right-0 text-center pointer-events-none z-30"
+              initial={{ opacity: 0, y: -30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ type: "spring", stiffness: 200 }}
+            >
+              <div className="inline-flex items-center gap-4 bg-black/60 backdrop-blur-sm border border-[#D4A843]/30 rounded-full px-8 py-3">
+                <span className="text-4xl text-white tracking-wider" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+                  {currentShooter}
+                </span>
+                <div className="h-6 w-px bg-[#D4A843]/40" />
+                <span className="text-2xl text-[#D4A843] tracking-wider" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+                  SHOT {shotInfo.shotNumber} OF {shotInfo.maxShots}
+                </span>
+              </div>
+            </motion.div>
+          )}
 
-            {shotStatus === "miss" && (
+          {shotStatus === "goal" && (
+            <>
+              <GoalCelebration show={true} />
               <motion.div
-                className="absolute inset-0 flex items-center justify-center pointer-events-none z-30"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
+                className="absolute inset-0 flex items-center justify-center pointer-events-none z-50"
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: [0.5, 1.15, 1] }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
               >
                 <div className="text-center">
-                  <h1 className="font-display text-[10rem] text-destructive leading-none drop-shadow-[0_0_40px_rgba(255,0,0,0.8)] italic">
-                    SAVED
-                  </h1>
-                  <p className="font-display text-3xl text-neutral-300 mt-2">
-                    {currentShooter} — Shot {shotInfo.shotNumber}/{shotInfo.maxShots}
-                  </p>
+                  <motion.h1
+                    className="leading-none italic"
+                    style={{
+                      fontFamily: "'Bebas Neue', sans-serif",
+                      fontSize: "14rem",
+                      letterSpacing: "0.05em",
+                    }}
+                    animate={{
+                      textShadow: [
+                        "0 0 40px rgba(0,255,102,1), 0 0 80px rgba(0,255,102,0.5)",
+                        "0 0 60px rgba(0,255,102,1), 0 0 120px rgba(0,255,102,0.7)",
+                        "0 0 40px rgba(0,255,102,1), 0 0 80px rgba(0,255,102,0.5)",
+                      ],
+                      color: ["#00ff66", "#66ffaa", "#00ff66"],
+                    }}
+                    transition={{ duration: 1, repeat: Infinity }}
+                  >
+                    GOAL!!!
+                  </motion.h1>
+                  <motion.div
+                    className="mt-2"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    <span className="text-5xl text-white" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+                      {currentShooter}
+                    </span>
+                    <span className="text-4xl text-[#D4A843] ml-4" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+                      {shotInfo.totalScore} PTS
+                    </span>
+                  </motion.div>
                 </div>
               </motion.div>
-            )}
-          </div>
+            </>
+          )}
 
-          <div className="px-8 pb-4">
-            <div className="bg-black/40 backdrop-blur-sm rounded-xl px-6 py-2 border border-neutral-800 flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-yellow-400" />
-                <span className="text-neutral-400 text-sm font-display tracking-wider">2-HOUR PRIZE WINDOW</span>
+          {shotStatus === "miss" && (
+            <motion.div
+              className="absolute inset-0 flex items-center justify-center pointer-events-none z-30"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+            >
+              <div className="text-center">
+                <h1
+                  className="leading-none italic"
+                  style={{
+                    fontFamily: "'Bebas Neue', sans-serif",
+                    fontSize: "12rem",
+                    letterSpacing: "0.05em",
+                    color: "hsl(0, 84%, 60%)",
+                    textShadow: "0 0 40px rgba(255,0,0,0.6), 0 0 80px rgba(255,0,0,0.3)",
+                  }}
+                >
+                  SAVED!
+                </h1>
+                <p className="text-3xl text-white/60 mt-1" style={{ fontFamily: "'Bebas Neue', sans-serif", letterSpacing: "0.15em" }}>
+                  {currentShooter} — Shot {shotInfo.shotNumber}/{shotInfo.maxShots}
+                </p>
               </div>
-              <div className="text-neutral-500 text-xs">
-                Highest score wins grand prize • Spot prizes during activation
-              </div>
-              <div className="bg-white/10 rounded-lg px-4 py-1 border border-white/10">
-                <span className="text-neutral-400 text-[10px] tracking-widest uppercase">Sponsored by</span>
-                <span className="text-white font-display text-sm ml-2 tracking-wider">YOUR BRAND</span>
+            </motion.div>
+          )}
+        </div>
+
+        <div className="px-10 pb-4">
+          <div className="flex items-center justify-between bg-black/30 backdrop-blur-sm rounded-xl border border-[#D4A843]/10 px-6 py-2.5">
+            <div className="flex items-center gap-3">
+              <Gift className="w-5 h-5 text-[#D4A843]" />
+              <span className="text-[#D4A843] text-lg tracking-[0.2em]" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+                2-HOUR PRIZE WINDOW
+              </span>
+              <div className="w-1 h-1 rounded-full bg-white/20" />
+              <span className="text-white/40 text-sm tracking-wider">
+                Grand prize for highest scorer • Spot prizes during activation
+              </span>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="h-8 w-px bg-white/10" />
+              <div className="flex items-center gap-3">
+                <span className="text-white/30 text-xs tracking-[0.2em] uppercase">Presented by</span>
+                <div className="bg-white/10 border border-white/10 rounded-lg px-5 py-1.5">
+                  <span className="text-white text-lg tracking-[0.15em]" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+                    YOUR BRAND
+                  </span>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <div className="absolute bottom-0 left-0 right-0 h-[2px] z-50" style={{
+        background: "linear-gradient(90deg, transparent, #D4A843 20%, #F5D780 50%, #D4A843 80%, transparent)"
+      }} />
     </div>
   );
 }

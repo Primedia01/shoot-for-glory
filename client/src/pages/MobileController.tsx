@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, PanInfo } from "framer-motion";
-import { ArrowUp, Zap, Target, User, Phone, MapPin, Shield, Wifi, WifiOff, Trophy, CheckCircle } from "lucide-react";
-import { Card } from "@/components/ui/card";
+import { ArrowUp, User, Phone, MapPin, Shield, Wifi, WifiOff, Trophy, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import GoalCelebration from "@/components/GoalCelebration";
@@ -175,68 +174,80 @@ export default function MobileController() {
 
   if (gamePhase === "register") {
     return (
-      <div className="flex flex-col min-h-[100dvh] bg-neutral-950 text-white">
-        <div className="bg-black/50 border-b border-neutral-800 px-4 py-3 text-center">
-          <div className="flex items-center justify-center gap-2 text-primary">
-            <Zap className="w-5 h-5 fill-primary" />
-            <span className="font-display tracking-widest text-xl">SHOOT FOR GLORY</span>
+      <div className="flex flex-col min-h-[100dvh] fifa-gradient-bg text-white">
+        <div className="h-[2px] w-full" style={{
+          background: "linear-gradient(90deg, transparent, #D4A843 30%, #F5D780 50%, #D4A843 70%, transparent)"
+        }} />
+        <div className="px-4 py-3 text-center">
+          <div className="flex items-center justify-center gap-2 mb-0.5">
+            <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="#D4A843" strokeWidth="1.5" fill="none" />
+              <circle cx="12" cy="12" r="3" fill="#D4A843" opacity="0.4" />
+            </svg>
+            <span className="text-[#D4A843] text-xs tracking-[0.4em]" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+              FIFA WORLD CUP 2026
+            </span>
           </div>
-          <p className="text-neutral-500 text-xs mt-1">FIFA World Cup 2026 Experience</p>
+          <h1 className="text-2xl text-white tracking-[0.1em]" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+            SHOOT FOR <span className="fifa-gradient-text">GLORY</span>
+          </h1>
         </div>
 
-        <div className="flex-1 flex flex-col items-center justify-center px-5 py-6 overflow-y-auto">
+        <div className="flex-1 flex flex-col items-center justify-center px-5 py-4 overflow-y-auto">
           <div className="w-full max-w-sm space-y-4">
-            <div className="text-center mb-4">
-              <h2 className="font-display text-2xl text-white tracking-wider">STEP UP TO THE SPOT</h2>
-              <p className="text-neutral-400 text-sm mt-1">Enter your details to play</p>
+            <div className="text-center mb-3">
+              <h2 className="text-3xl text-white tracking-[0.08em]" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+                STEP UP TO THE SPOT
+              </h2>
+              <p className="text-white/40 text-sm mt-1">Enter your details to play</p>
             </div>
 
-            <Card className="bg-neutral-900/80 backdrop-blur border-neutral-800 p-5">
+            <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-5">
               <form onSubmit={handleJoin} className="space-y-3">
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#D4A843]/60" />
                   <Input
                     data-testid="input-mobile-username"
                     value={playerName}
                     onChange={(e) => setPlayerName(e.target.value)}
                     placeholder="Your name"
-                    className="pl-10 bg-neutral-900 border-neutral-700 text-white h-11"
+                    className="pl-10 bg-white/5 border-white/10 text-white h-12 rounded-xl placeholder:text-white/25 focus:border-[#D4A843]/50"
                     autoComplete="off"
                     required
                   />
                 </div>
 
                 <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#D4A843]/60" />
                   <Input
                     data-testid="input-mobile-number"
                     value={mobile}
                     onChange={(e) => setMobile(e.target.value)}
                     placeholder="Mobile number"
                     type="tel"
-                    className="pl-10 bg-neutral-900 border-neutral-700 text-white h-11"
+                    className="pl-10 bg-white/5 border-white/10 text-white h-12 rounded-xl placeholder:text-white/25 focus:border-[#D4A843]/50"
                     autoComplete="off"
                   />
                 </div>
 
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#D4A843]/60" />
                   <select
                     data-testid="select-province"
                     value={province}
                     onChange={(e) => setProvince(e.target.value)}
-                    className="w-full pl-10 pr-4 h-11 bg-neutral-900 border border-neutral-700 text-white rounded-md appearance-none cursor-pointer"
+                    className="w-full pl-10 pr-4 h-12 bg-white/5 border border-white/10 text-white rounded-xl appearance-none cursor-pointer focus:border-[#D4A843]/50"
                     required
                   >
-                    <option value="" disabled>Select province</option>
+                    <option value="" disabled className="bg-[#1a0610]">Select province</option>
                     {PROVINCES.map((p) => (
-                      <option key={p} value={p}>{p}</option>
+                      <option key={p} value={p} className="bg-[#1a0610]">{p}</option>
                     ))}
                   </select>
                 </div>
 
                 <div className="relative">
-                  <Wifi className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
+                  <Wifi className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#D4A843]/60" />
                   <Input
                     data-testid="input-room-code"
                     value={roomCode || manualCode}
@@ -244,8 +255,8 @@ export default function MobileController() {
                       if (roomCode) return;
                       setManualCode(e.target.value.toUpperCase());
                     }}
-                    placeholder="Room code (on screen)"
-                    className="pl-10 bg-neutral-900 border-neutral-700 text-white h-11 tracking-[0.3em] uppercase"
+                    placeholder="Room code"
+                    className="pl-10 bg-white/5 border-white/10 text-white h-12 rounded-xl tracking-[0.3em] uppercase placeholder:text-white/25 focus:border-[#D4A843]/50"
                     maxLength={4}
                     readOnly={!!roomCode}
                     autoComplete="off"
@@ -255,15 +266,15 @@ export default function MobileController() {
 
                 <label
                   data-testid="label-consent"
-                  className="flex items-start gap-3 p-3 bg-neutral-800/50 rounded-lg cursor-pointer"
+                  className="flex items-start gap-3 p-3 bg-white/5 rounded-xl cursor-pointer border border-white/5"
                 >
                   <input
                     type="checkbox"
                     checked={consent}
                     onChange={(e) => setConsent(e.target.checked)}
-                    className="mt-0.5 w-4 h-4 accent-primary"
+                    className="mt-0.5 w-4 h-4 accent-[#D4A843]"
                   />
-                  <span className="text-neutral-400 text-xs leading-relaxed">
+                  <span className="text-white/40 text-xs leading-relaxed">
                     I agree to receive promotional communications and updates about future activations and prizes.
                   </span>
                 </label>
@@ -275,62 +286,84 @@ export default function MobileController() {
                 <Button
                   data-testid="button-join"
                   type="submit"
-                  className="w-full h-11 text-lg font-display tracking-widest"
+                  className="w-full h-12 text-lg tracking-[0.2em] rounded-xl font-bold"
+                  style={{
+                    fontFamily: "'Bebas Neue', sans-serif",
+                    background: "linear-gradient(135deg, #D4A843 0%, #B8892E 100%)",
+                    color: "#1a0610",
+                  }}
                   disabled={connectionStatus === "connecting" || !playerName.trim() || !province || !(roomCode || manualCode).trim()}
                 >
                   {connectionStatus === "connecting" ? "CONNECTING..." : "PLAY NOW"}
                 </Button>
               </form>
-            </Card>
+            </div>
 
-            <div className="flex items-center gap-2 justify-center text-neutral-600 text-xs">
+            <div className="flex items-center gap-2 justify-center text-white/20 text-xs">
               <Shield className="w-3 h-3" />
               <span>Your data is handled securely</span>
             </div>
           </div>
         </div>
 
-        <div className="bg-neutral-900/50 border-t border-neutral-800 px-4 py-2 text-center">
-          <div className="h-8 flex items-center justify-center">
-            <span className="text-neutral-600 text-[10px] tracking-widest uppercase">Powered by your brand</span>
+        <div className="px-4 py-2 text-center border-t border-white/5">
+          <div className="h-7 flex items-center justify-center gap-2">
+            <span className="text-white/20 text-[10px] tracking-[0.2em] uppercase">Powered by</span>
+            <span className="text-white/40 text-xs tracking-[0.15em]" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>YOUR BRAND</span>
           </div>
         </div>
+        <div className="h-[2px] w-full" style={{
+          background: "linear-gradient(90deg, transparent, #D4A843 30%, #F5D780 50%, #D4A843 70%, transparent)"
+        }} />
       </div>
     );
   }
 
   if (gamePhase === "game_over") {
     return (
-      <div className="flex flex-col min-h-[100dvh] bg-neutral-950 text-white">
-        <div className="bg-black/50 border-b border-neutral-800 px-4 py-3 text-center">
-          <div className="flex items-center justify-center gap-2 text-primary">
-            <Trophy className="w-5 h-5" />
-            <span className="font-display tracking-widest text-xl">GAME OVER</span>
+      <div className="flex flex-col min-h-[100dvh] fifa-gradient-bg text-white">
+        <div className="h-[2px] w-full" style={{
+          background: "linear-gradient(90deg, transparent, #D4A843 30%, #F5D780 50%, #D4A843 70%, transparent)"
+        }} />
+        <div className="px-4 py-3 text-center">
+          <div className="flex items-center justify-center gap-2">
+            <Trophy className="w-5 h-5 text-[#D4A843]" />
+            <span className="text-2xl text-white tracking-[0.1em]" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+              GAME OVER
+            </span>
           </div>
         </div>
 
-        <div className="flex-1 flex flex-col items-center justify-center px-6 py-8">
+        <div className="flex-1 flex flex-col items-center justify-center px-6 py-6 overflow-y-auto">
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="text-center space-y-6 w-full max-w-sm"
+            className="text-center space-y-5 w-full max-w-sm"
           >
             <div>
-              <CheckCircle className="w-16 h-16 text-primary mx-auto mb-4" />
-              <h2 className="font-display text-4xl text-white">NICE WORK!</h2>
-              <p className="text-neutral-400 mt-2">You've used all {maxShots} shots</p>
+              <CheckCircle className="w-14 h-14 text-[#D4A843] mx-auto mb-3" />
+              <h2 className="text-4xl text-white tracking-[0.08em]" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+                FULL TIME!
+              </h2>
+              <p className="text-white/40 mt-1 text-sm">All {maxShots} shots taken</p>
             </div>
 
-            <Card className="bg-neutral-900/80 backdrop-blur border-neutral-800 p-6">
-              <p className="text-neutral-400 text-sm mb-1">YOUR FINAL SCORE</p>
-              <p data-testid="text-final-score" className="font-display text-6xl text-primary">{totalScore}</p>
+            <div className="bg-white/5 backdrop-blur border border-[#D4A843]/20 rounded-2xl p-6">
+              <p className="text-[#D4A843] text-sm tracking-[0.2em] mb-1" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+                YOUR FINAL SCORE
+              </p>
+              <p data-testid="text-final-score" className="text-6xl fifa-gradient-text" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+                {totalScore}
+              </p>
               {currentRank > 0 && (
-                <p className="text-neutral-400 mt-2">Rank <span className="text-white font-bold">#{currentRank}</span> on the leaderboard</p>
+                <p className="text-white/40 mt-2 text-sm">
+                  Rank <span className="text-white font-bold">#{currentRank}</span> on the leaderboard
+                </p>
               )}
-            </Card>
+            </div>
 
-            <Card className="bg-neutral-900/80 backdrop-blur border-neutral-800 p-4">
-              <h3 className="font-display text-lg text-primary tracking-widest mb-3 flex items-center gap-2">
+            <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-4">
+              <h3 className="text-lg text-[#D4A843] tracking-[0.2em] mb-3 flex items-center gap-2" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
                 <Trophy className="w-4 h-4" /> LEADERBOARD
               </h3>
               <div className="space-y-2">
@@ -338,92 +371,118 @@ export default function MobileController() {
                   <div
                     key={entry.playerId}
                     data-testid={`row-final-leaderboard-${i}`}
-                    className={`flex justify-between items-center px-3 py-2 rounded text-sm ${
+                    className={`flex justify-between items-center px-3 py-2 rounded-lg text-sm ${
                       entry.playerId === playerId
-                        ? "bg-primary/20 text-primary"
+                        ? "bg-[#D4A843]/15 border border-[#D4A843]/30 text-[#D4A843]"
                         : i === 0
-                        ? "bg-yellow-500/20 text-yellow-400"
-                        : "bg-white/10 text-white"
+                        ? "bg-[#D4A843]/10 text-[#D4A843]"
+                        : "bg-white/5 text-white/70"
                     }`}
                   >
-                    <span className="truncate mr-2">{i + 1}. {entry.playerName}</span>
-                    <span className="font-display text-lg flex-shrink-0">{entry.totalPoints}</span>
+                    <span className="truncate mr-2">
+                      {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}.`} {entry.playerName}
+                    </span>
+                    <span className="text-lg flex-shrink-0" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>{entry.totalPoints}</span>
                   </div>
                 ))}
               </div>
-            </Card>
+            </div>
 
-            <div className="bg-primary/10 border border-primary/30 rounded-xl p-4 text-center">
-              <p className="font-display text-lg text-primary tracking-wider">WIN PRIZES!</p>
-              <p className="text-neutral-400 text-sm mt-1">
-                Top scorer in this 2-hour window wins the grand prize. Spot prizes awarded during the activation!
+            <div className="bg-[#D4A843]/10 border border-[#D4A843]/20 rounded-2xl p-4 text-center">
+              <p className="text-lg text-[#D4A843] tracking-[0.15em]" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+                WIN PRIZES!
+              </p>
+              <p className="text-white/40 text-sm mt-1">
+                Top scorer in this 2-hour window wins the grand prize. Spot prizes during activation!
               </p>
             </div>
           </motion.div>
         </div>
 
-        <div className="bg-neutral-900/50 border-t border-neutral-800 px-4 py-2 text-center">
-          <div className="h-8 flex items-center justify-center">
-            <span className="text-neutral-600 text-[10px] tracking-widest uppercase">Powered by your brand</span>
+        <div className="px-4 py-2 text-center border-t border-white/5">
+          <div className="h-7 flex items-center justify-center gap-2">
+            <span className="text-white/20 text-[10px] tracking-[0.2em] uppercase">Powered by</span>
+            <span className="text-white/40 text-xs tracking-[0.15em]" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>YOUR BRAND</span>
           </div>
         </div>
+        <div className="h-[2px] w-full" style={{
+          background: "linear-gradient(90deg, transparent, #D4A843 30%, #F5D780 50%, #D4A843 70%, transparent)"
+        }} />
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col min-h-[100dvh] bg-neutral-950 text-white overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-2 bg-black/50 border-b border-neutral-800">
+    <div className="flex flex-col min-h-[100dvh] fifa-gradient-bg text-white overflow-hidden">
+      <div className="h-[2px] w-full" style={{
+        background: "linear-gradient(90deg, transparent, #D4A843 30%, #F5D780 50%, #D4A843 70%, transparent)"
+      }} />
+      <div className="flex items-center justify-between px-4 py-2.5 bg-black/20">
         <div className="flex items-center gap-2">
           {connectionStatus === "connected" ? (
-            <><Wifi className="w-3 h-3 text-primary" /><span className="text-primary text-xs font-display tracking-wider">LIVE</span></>
+            <>
+              <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              <span className="text-primary text-xs tracking-[0.2em]" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>LIVE</span>
+            </>
           ) : (
-            <><WifiOff className="w-3 h-3 text-destructive" /><span className="text-destructive text-xs">OFFLINE</span></>
+            <>
+              <WifiOff className="w-3 h-3 text-destructive" />
+              <span className="text-destructive text-xs">OFFLINE</span>
+            </>
           )}
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5">
           {Array.from({ length: maxShots }).map((_, i) => (
             <div
               key={i}
               data-testid={`shot-indicator-${i}`}
-              className={`w-3 h-3 rounded-full border ${
+              className={`w-3.5 h-3.5 rounded-full border-2 transition-all duration-300 ${
                 i < shotsTaken
-                  ? "bg-primary border-primary"
-                  : "bg-transparent border-neutral-600"
+                  ? "bg-[#D4A843] border-[#D4A843] shadow-[0_0_8px_rgba(212,168,67,0.5)]"
+                  : "bg-transparent border-white/20"
               }`}
             />
           ))}
         </div>
-        <div className="text-right">
-          <span className="font-display text-lg text-primary">{totalScore}</span>
-          <span className="text-neutral-500 text-[10px] ml-1">PTS</span>
+        <div className="text-right flex items-baseline gap-1">
+          <span className="text-2xl text-[#D4A843]" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>{totalScore}</span>
+          <span className="text-white/30 text-[10px] tracking-wider">PTS</span>
         </div>
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-end pb-14 relative">
-        <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
-          <Target className="w-64 h-64" />
+        <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
+          <svg viewBox="0 0 200 200" className="w-72 h-72" fill="none">
+            <circle cx="100" cy="100" r="90" stroke="white" strokeWidth="2" />
+            <circle cx="100" cy="100" r="60" stroke="white" strokeWidth="1.5" />
+            <circle cx="100" cy="100" r="30" stroke="white" strokeWidth="1" />
+            <line x1="10" y1="100" x2="190" y2="100" stroke="white" strokeWidth="1" />
+            <line x1="100" y1="10" x2="100" y2="190" stroke="white" strokeWidth="1" />
+          </svg>
         </div>
 
-        <div className="absolute top-[20%] w-full text-center px-4">
+        <div className="absolute top-[18%] w-full text-center px-4">
           {shotStatus === "idle" && shotsRemaining > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex flex-col items-center gap-2 text-neutral-400"
+              className="flex flex-col items-center gap-3"
             >
-              <ArrowUp className="w-10 h-10 animate-bounce text-primary" />
-              <span className="font-display text-3xl uppercase tracking-widest text-primary">
-                Swipe to Shoot
+              <ArrowUp className="w-10 h-10 animate-bounce text-[#D4A843]" />
+              <span className="text-4xl text-white tracking-[0.08em]" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+                SWIPE TO SHOOT
               </span>
-              <span className="text-neutral-500 text-sm">
-                Shot {shotsTaken + 1} of {maxShots}
+              <span className="text-white/30 text-sm tracking-wider" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+                SHOT {shotsTaken + 1} OF {maxShots}
               </span>
             </motion.div>
           )}
           {shotStatus === "shooting" && (
             <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }}>
-              <h2 className="font-display text-5xl text-yellow-400 animate-pulse">Power: {power}%</h2>
+              <h2 className="text-6xl text-[#D4A843] animate-pulse" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+                {power}%
+              </h2>
+              <p className="text-white/40 text-sm tracking-wider mt-1">POWER</p>
             </motion.div>
           )}
           {shotStatus === "goal" && (
@@ -436,20 +495,23 @@ export default function MobileController() {
                 className="space-y-2"
               >
                 <motion.div
-                  className="font-display text-7xl text-primary"
+                  className="text-8xl"
+                  style={{ fontFamily: "'Bebas Neue', sans-serif" }}
                   animate={{
                     textShadow: [
                       "0 0 20px rgba(0,255,102,0.8)",
                       "0 0 40px rgba(0,255,102,1)",
                       "0 0 20px rgba(0,255,102,0.8)",
                     ],
+                    color: ["#00ff66", "#66ffaa", "#00ff66"],
                   }}
                   transition={{ duration: 0.8, repeat: Infinity }}
                 >
                   GOAL!
                 </motion.div>
                 <motion.div
-                  className="font-display text-2xl text-white"
+                  className="text-2xl text-[#D4A843]"
+                  style={{ fontFamily: "'Bebas Neue', sans-serif" }}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
@@ -457,7 +519,7 @@ export default function MobileController() {
                   +100 POINTS
                 </motion.div>
                 {shotsRemaining > 0 && (
-                  <p className="text-neutral-400 text-sm mt-2">{shotsRemaining} shot{shotsRemaining !== 1 ? "s" : ""} remaining</p>
+                  <p className="text-white/40 text-sm mt-2">{shotsRemaining} shot{shotsRemaining !== 1 ? "s" : ""} remaining</p>
                 )}
               </motion.div>
             </>
@@ -467,11 +529,13 @@ export default function MobileController() {
               initial={{ scale: 0.5, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
             >
-              <div className="font-display text-6xl text-destructive">SAVED!</div>
+              <div className="text-7xl text-destructive" style={{ fontFamily: "'Bebas Neue', sans-serif", textShadow: "0 0 30px rgba(255,0,0,0.4)" }}>
+                SAVED!
+              </div>
               {shotsRemaining > 0 ? (
-                <div className="text-neutral-400 mt-2">{shotsRemaining} shot{shotsRemaining !== 1 ? "s" : ""} remaining</div>
+                <div className="text-white/40 mt-2 text-sm">{shotsRemaining} shot{shotsRemaining !== 1 ? "s" : ""} remaining</div>
               ) : (
-                <div className="text-neutral-400 mt-2">No shots left</div>
+                <div className="text-white/40 mt-2 text-sm">No shots left</div>
               )}
             </motion.div>
           )}
@@ -488,10 +552,11 @@ export default function MobileController() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
+            <div className="absolute inset-0 rounded-full bg-[#D4A843]/20 blur-xl animate-pulse" />
             <img
               src={soccerBall}
               alt="Soccer Ball"
-              className="w-full h-full object-contain drop-shadow-[0_10px_30px_rgba(0,0,0,0.6)]"
+              className="w-full h-full object-contain relative z-10 drop-shadow-[0_10px_30px_rgba(0,0,0,0.6)]"
               draggable={false}
             />
           </motion.div>
@@ -501,14 +566,16 @@ export default function MobileController() {
           </div>
         )}
 
-        <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-primary/15 to-transparent pointer-events-none" />
+        <div className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none" style={{
+          background: "linear-gradient(to top, rgba(86,4,44,0.3), transparent)"
+        }} />
       </div>
 
       {currentRank > 0 && (
         <div className="px-3 pb-2">
-          <div className="bg-black/60 backdrop-blur-sm rounded-xl px-4 py-2 border border-neutral-800 flex justify-between items-center">
-            <span className="text-neutral-400 text-xs">Rank</span>
-            <span className="font-display text-lg text-primary">#{currentRank}</span>
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl px-4 py-2 border border-white/10 flex justify-between items-center">
+            <span className="text-white/40 text-xs tracking-wider">Rank</span>
+            <span className="text-xl text-[#D4A843]" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>#{currentRank}</span>
           </div>
         </div>
       )}

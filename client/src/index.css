@@ -31,8 +31,13 @@
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
 
+  --color-fifa-gold: #D4A843;
+  --color-fifa-maroon: #56042C;
+  --color-fifa-teal: #1B998B;
+
   --font-sans: 'Inter', sans-serif;
   --font-display: 'Teko', sans-serif;
+  --font-headline: 'Bebas Neue', sans-serif;
 }
 
 :root {
@@ -43,7 +48,6 @@
   --popover: 222 47% 15%;
   --popover-foreground: 210 40% 98%;
   
-  /* Neon green / stadium green */
   --primary: 142 71% 45%;
   --primary-foreground: 144 100% 11%;
   
@@ -83,4 +87,44 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-display uppercase tracking-wider;
   }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(212, 168, 67, 0.3), 0 0 40px rgba(212, 168, 67, 0.1); }
+  50% { box-shadow: 0 0 30px rgba(212, 168, 67, 0.5), 0 0 60px rgba(212, 168, 67, 0.2); }
+}
+
+@keyframes scan-line {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes float-up {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-30px); opacity: 0; }
+}
+
+.animate-shimmer {
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.fifa-gradient-text {
+  background: linear-gradient(135deg, #D4A843 0%, #F5D780 40%, #D4A843 60%, #B8892E 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.fifa-gradient-bg {
+  background: linear-gradient(135deg, #56042C 0%, #1a0610 50%, #0a1628 100%);
 }

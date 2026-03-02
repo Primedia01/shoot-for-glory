@@ -12,7 +12,7 @@ Interactive web-based prototypes simulating mobile-to-screen synchronization for
 ## Pages / Routes
 | Route | Purpose |
 |-------|---------|
-| `/` | Split-screen demo (phone simulator + billboard in one view) |
+| `/` | Billboard display (same as /screen) — FIFA World Cup 2026 themed big screen |
 | `/screen` | Billboard display — shows on the big screen, generates QR code |
 | `/mobile` | Mobile controller — opened on phone, swipe-to-shoot interface |
 

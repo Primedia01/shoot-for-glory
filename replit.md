@@ -6,8 +6,8 @@ Interactive web-based prototypes simulating mobile-to-screen synchronization for
 ## Architecture
 - **Frontend**: React + Vite + TailwindCSS + Framer Motion + wouter routing
 - **Backend**: Express.js with WebSocket (ws) for real-time sync
-- **Storage**: In-memory (MemStorage) for prototype speed; PostgreSQL schema defined but not active
-- **Real-time**: WebSocket room-based system for phone-to-billboard sync
+- **Storage**: PostgreSQL via Drizzle ORM — game scores persisted for global leaderboard
+- **Real-time**: WebSocket room-based system for phone-to-billboard sync + global leaderboard broadcasts
 
 ## Pages / Routes
 | Route | Purpose |
@@ -21,46 +21,52 @@ Interactive web-based prototypes simulating mobile-to-screen synchronization for
 2. **Register** — Enter name, mobile number, province (dropdown), optional consent opt-in
 3. **Play** — 3 swipe attempts; direction + speed determines trajectory; AI goalkeeper responds
 4. **Live Screen** — Player name appears on billboard; shot animation synced live; score on leaderboard
-5. **Game Over** — Final score, leaderboard rank, prize messaging
+5. **Game Over** — Final score, global leaderboard rank, prize messaging
 6. **Win** — Highest score in 2-hour prize window wins grand prize; spot prizes during activation
 
+## Database Schema
+- `game_scores` — Persisted completed game results: playerName, mobile, province, totalPoints, shotsScored, totalShots, createdAt
+- `players` / `shots` — Legacy tables (defined but not actively used)
+
 ## WebSocket Protocol
-- Billboard sends `create_room` → receives `room_created` with roomCode
-- Mobile sends `join_room` with playerName, mobile, province, consent → receives `joined` with maxShots=3
+- Billboard sends `create_room` → receives `room_created` with roomCode + globalLeaderboard
+- Mobile sends `join_room` with playerName, mobile, province, consent → receives `joined` with maxShots=3 + globalLeaderboard
 - Mobile sends `shoot` → receives `shot_result` with shotsRemaining, shotNumber, totalScore
-- After 3rd shot, server sends `game_over` to mobile and `player_finished` to billboard
+- After 3rd shot: score saved to DB, server sends `game_over` to mobile and `player_finished` to billboard (both include globalLeaderboard)
+- `global_leaderboard_update` broadcast to all connected billboards and mobiles after each game completes
 - Server enforces MAX_SHOTS=3 per player
 
 ## Key Files
-- `client/src/pages/ShootForGlory.tsx` — Original split-screen prototype
-- `client/src/pages/MobileController.tsx` — Phone: registration → 3-shot game → game over
-- `client/src/pages/BillboardScreen.tsx` — Billboard with QR code, branding zones, shot tracking
+- `client/src/pages/MobileController.tsx` — Phone: registration → 3-shot game → game over with global leaderboard
+- `client/src/pages/BillboardScreen.tsx` — Billboard with QR code, branding zones, global leaderboard, shot tracking
 - `client/src/components/GoalCelebration.tsx` — Confetti + ring burst animation
-- `client/src/components/Goalie.tsx` — Virtual goalkeeper with diving animations
-- `server/websocket.ts` — WebSocket room manager with 3-shot mechanic
+- `client/src/components/Goalie.tsx` — Virtual goalkeeper with diving animations, brandable jersey
+- `client/src/components/StadiumBackground.tsx` — SVG illustrated stadium with pixel-mosaic crowd, goal with netting
+- `server/websocket.ts` — WebSocket room manager with 3-shot mechanic + global leaderboard broadcasts
 - `server/routes.ts` — REST API endpoints + WebSocket setup
-- `server/storage.ts` — In-memory storage for players/shots/leaderboard
-- `shared/schema.ts` — Drizzle schema (players, shots tables)
-- `client/src/index.css` — Neon Arena theme (dark + green neon accents)
+- `server/storage.ts` — DatabaseStorage using Drizzle ORM for game scores + global leaderboard
+- `server/db.ts` — PostgreSQL connection pool via Drizzle
+- `shared/schema.ts` — Drizzle schema (gameScores, players, shots tables)
+- `client/src/index.css` — FIFA World Cup 2026 theme
 
-## Billboard Branding Zones
-- Top-left: Sponsor logo placeholder ("YOUR LOGO")
-- Bottom bar: Sponsored by placeholder ("YOUR BRAND")
-- Prize messaging: 2-hour window, grand prize, spot prizes
-
-## Theme: Neon Arena
-- Dark stadium background with neon green (#00ff66) accents
-- Fonts: Teko (display/headings), Inter (body)
-- Colors defined as CSS custom properties in index.css
+## Theme: FIFA World Cup 2026
+- Dark navy background (#1a0e30), maroon (#56042C), gold (#D4A843)
+- Fonts: Bebas Neue (display/headings), Teko, Inter (body)
+- CSS classes: `fifa-gradient-text`, `fifa-gradient-bg`
+- SVG illustrated stadium background with pixel-mosaic crowd
 
 ## Dependencies
 - framer-motion (swipe gestures + animations)
 - qrcode.react (QR code generation on billboard)
 - ws (WebSocket server)
+- drizzle-orm + pg (PostgreSQL ORM + driver)
 - @tanstack/react-query (data fetching)
 - wouter (client-side routing)
 - lucide-react (icons)
 
 ## Static Assets
-- `client/public/stadium-bg.jpg` — Stadium background image
 - `client/public/soccer-ball.png` — Soccer ball sprite
+
+## Critical Notes
+- Cannot edit `server/vite.ts` — `process.exit(1)` in Vite error logger causes crashes; workflow uses `while true; do npm run dev; done`
+- SA provinces: Eastern Cape, Free State, Gauteng, KwaZulu-Natal, Limpopo, Mpumalanga, North West, Northern Cape, Western Cape

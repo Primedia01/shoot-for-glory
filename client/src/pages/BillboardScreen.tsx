@@ -19,12 +19,22 @@ interface LeaderboardEntry {
   province: string;
 }
 
+interface GlobalLeaderboardEntry {
+  id: string;
+  playerName: string;
+  province: string | null;
+  totalPoints: number;
+  shotsScored: number;
+  createdAt: string | null;
+}
+
 export default function BillboardScreen() {
   const [roomCode, setRoomCode] = useState<string | null>(null);
   const [shotStatus, setShotStatus] = useState<ShotStatus>("idle");
   const [currentShooter, setCurrentShooter] = useState("");
   const [playerCount, setPlayerCount] = useState(0);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [globalLeaderboard, setGlobalLeaderboard] = useState<GlobalLeaderboardEntry[]>([]);
   const [lastPoints, setLastPoints] = useState(0);
   const [goalieState, setGoalieState] = useState<GoalieState>("idle");
   const [shotInfo, setShotInfo] = useState({ shotNumber: 0, maxShots: 3, totalScore: 0 });
@@ -49,6 +59,7 @@ export default function BillboardScreen() {
       switch (msg.type) {
         case "room_created":
           setRoomCode(msg.roomCode);
+          if (msg.globalLeaderboard) setGlobalLeaderboard(msg.globalLeaderboard);
           break;
         case "player_joined":
           setPlayerCount(msg.playerCount);
@@ -58,6 +69,10 @@ export default function BillboardScreen() {
           break;
         case "player_finished":
           setLeaderboard(msg.leaderboard || []);
+          if (msg.globalLeaderboard) setGlobalLeaderboard(msg.globalLeaderboard);
+          break;
+        case "global_leaderboard_update":
+          setGlobalLeaderboard(msg.leaderboard || []);
           break;
         case "shot_fired": {
           setCurrentShooter(msg.playerName);
@@ -211,7 +226,7 @@ export default function BillboardScreen() {
               </div>
             )}
 
-            <div className="bg-black/40 backdrop-blur-md border border-[#D4A843]/20 rounded-2xl p-5 min-w-[280px] max-h-[340px]">
+            <div className="bg-black/40 backdrop-blur-md border border-[#D4A843]/20 rounded-2xl p-5 min-w-[300px] max-h-[380px] overflow-hidden">
               <div className="flex items-center gap-2 mb-3">
                 <Trophy className="w-5 h-5 text-[#D4A843]" />
                 <h3
@@ -219,18 +234,18 @@ export default function BillboardScreen() {
                   className="text-xl tracking-[0.25em] text-[#D4A843]"
                   style={{ fontFamily: "'Bebas Neue', sans-serif" }}
                 >
-                  LEADERBOARD
+                  GLOBAL LEADERBOARD
                 </h3>
               </div>
-              <div className="space-y-2">
-                {leaderboard.length === 0 && (
+              <div className="space-y-2 overflow-y-auto max-h-[300px] pr-1">
+                {globalLeaderboard.length === 0 && (
                   <p className="text-white/30 text-sm text-center py-6 tracking-wider">
                     Scan QR code to be first!
                   </p>
                 )}
-                {leaderboard.slice(0, 5).map((entry, i) => (
+                {globalLeaderboard.slice(0, 10).map((entry, i) => (
                   <motion.div
-                    key={entry.playerId}
+                    key={entry.id}
                     data-testid={`row-billboard-leaderboard-${i}`}
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -252,9 +267,12 @@ export default function BillboardScreen() {
                         )}
                       </div>
                     </div>
-                    <span className="text-2xl flex-shrink-0" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
-                      {entry.totalPoints}
-                    </span>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <span className="text-white/30 text-xs">{entry.shotsScored}/3</span>
+                      <span className="text-2xl" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+                        {entry.totalPoints}
+                      </span>
+                    </div>
                   </motion.div>
                 ))}
               </div>

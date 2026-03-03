@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, timestamp, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -19,10 +19,24 @@ export const shots = pgTable("shots", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const gameScores = pgTable("game_scores", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  playerName: text("player_name").notNull(),
+  mobile: text("mobile"),
+  province: text("province"),
+  totalPoints: integer("total_points").notNull().default(0),
+  shotsScored: integer("shots_scored").notNull().default(0),
+  totalShots: integer("total_shots").notNull().default(3),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const insertPlayerSchema = createInsertSchema(players).omit({ id: true });
 export const insertShotSchema = createInsertSchema(shots).omit({ id: true, createdAt: true });
+export const insertGameScoreSchema = createInsertSchema(gameScores).omit({ id: true, createdAt: true });
 
 export type InsertPlayer = z.infer<typeof insertPlayerSchema>;
 export type Player = typeof players.$inferSelect;
 export type InsertShot = z.infer<typeof insertShotSchema>;
 export type Shot = typeof shots.$inferSelect;
+export type InsertGameScore = z.infer<typeof insertGameScoreSchema>;
+export type GameScore = typeof gameScores.$inferSelect;

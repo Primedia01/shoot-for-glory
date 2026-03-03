@@ -30,6 +30,15 @@ interface LeaderboardEntry {
   province: string;
 }
 
+interface GlobalLeaderboardEntry {
+  id: string;
+  playerName: string;
+  province: string | null;
+  totalPoints: number;
+  shotsScored: number;
+  createdAt: string | null;
+}
+
 export default function MobileController() {
   const [playerName, setPlayerName] = useState("");
   const [mobile, setMobile] = useState("");
@@ -46,6 +55,7 @@ export default function MobileController() {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>("disconnected");
   const [errorMessage, setErrorMessage] = useState("");
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [globalLeaderboard, setGlobalLeaderboard] = useState<GlobalLeaderboardEntry[]>([]);
   const [gamePhase, setGamePhase] = useState<GamePhase>("register");
   const wsRef = useRef<WebSocket | null>(null);
 
@@ -82,6 +92,7 @@ export default function MobileController() {
           setShotsRemaining(msg.shotsRemaining);
           setMaxShots(msg.maxShots);
           setLeaderboard(msg.leaderboard || []);
+          if (msg.globalLeaderboard) setGlobalLeaderboard(msg.globalLeaderboard);
           setGamePhase("playing");
           break;
         case "error":
@@ -97,9 +108,13 @@ export default function MobileController() {
         case "leaderboard_update":
           setLeaderboard(msg.leaderboard || []);
           break;
+        case "global_leaderboard_update":
+          setGlobalLeaderboard(msg.leaderboard || []);
+          break;
         case "game_over":
           setTotalScore(msg.totalScore);
           setLeaderboard(msg.leaderboard || []);
+          if (msg.globalLeaderboard) setGlobalLeaderboard(msg.globalLeaderboard);
           setGamePhase("game_over");
           break;
         case "room_closed":
@@ -364,17 +379,18 @@ export default function MobileController() {
 
             <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-4">
               <h3 className="text-lg text-[#D4A843] tracking-[0.2em] mb-3 flex items-center gap-2" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
-                <Trophy className="w-4 h-4" /> LEADERBOARD
+                <Trophy className="w-4 h-4" /> GLOBAL LEADERBOARD
               </h3>
               <div className="space-y-2">
-                {leaderboard.slice(0, 5).map((entry, i) => (
+                {globalLeaderboard.length === 0 && leaderboard.length === 0 && (
+                  <p className="text-white/30 text-sm text-center py-3">No scores yet</p>
+                )}
+                {(globalLeaderboard.length > 0 ? globalLeaderboard : []).slice(0, 5).map((entry, i) => (
                   <div
-                    key={entry.playerId}
+                    key={entry.id}
                     data-testid={`row-final-leaderboard-${i}`}
                     className={`flex justify-between items-center px-3 py-2 rounded-lg text-sm ${
-                      entry.playerId === playerId
-                        ? "bg-[#D4A843]/15 border border-[#D4A843]/30 text-[#D4A843]"
-                        : i === 0
+                      i === 0
                         ? "bg-[#D4A843]/10 text-[#D4A843]"
                         : "bg-white/5 text-white/70"
                     }`}
@@ -382,7 +398,10 @@ export default function MobileController() {
                     <span className="truncate mr-2">
                       {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}.`} {entry.playerName}
                     </span>
-                    <span className="text-lg flex-shrink-0" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>{entry.totalPoints}</span>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <span className="text-white/30 text-xs">{entry.shotsScored}/3</span>
+                      <span className="text-lg" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>{entry.totalPoints}</span>
+                    </div>
                   </div>
                 ))}
               </div>

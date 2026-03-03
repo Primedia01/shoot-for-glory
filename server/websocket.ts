@@ -1,6 +1,7 @@
 import { WebSocketServer, WebSocket } from "ws";
 import { type Server } from "http";
 import { nanoid } from "nanoid";
+import { storage } from "./storage";
 
 const MAX_SHOTS = 3;
 
@@ -12,6 +13,7 @@ interface PlayerData {
   consent: boolean;
   shotsUsed: number;
   totalPoints: number;
+  goalsScored: number;
 }
 
 interface Room {
@@ -21,6 +23,7 @@ interface Room {
 }
 
 const rooms = new Map<string, Room>();
+const allBillboards = new Set<WebSocket>();
 
 function generateRoomCode(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -37,7 +40,7 @@ function sendTo(ws: WebSocket, message: object) {
   }
 }
 
-function getLeaderboardArray(room: Room) {
+function getRoomLeaderboard(room: Room) {
   return Array.from(room.mobiles.entries())
     .map(([playerId, data]) => ({
       playerId,
@@ -48,6 +51,30 @@ function getLeaderboardArray(room: Room) {
     .filter((e) => e.totalPoints > 0)
     .sort((a, b) => b.totalPoints - a.totalPoints)
     .slice(0, 10);
+}
+
+async function getGlobalLeaderboard() {
+  const entries = await storage.getGlobalLeaderboard(20);
+  return entries.map((e) => ({
+    id: e.id,
+    playerName: e.playerName,
+    province: e.province,
+    totalPoints: e.totalPoints,
+    shotsScored: e.shotsScored,
+    createdAt: e.createdAt,
+  }));
+}
+
+function broadcastGlobalLeaderboard(globalLeaderboard: any[]) {
+  const msg = { type: "global_leaderboard_update", leaderboard: globalLeaderboard };
+  for (const billboard of allBillboards) {
+    sendTo(billboard, msg);
+  }
+  for (const room of rooms.values()) {
+    for (const [, mobile] of room.mobiles) {
+      sendTo(mobile.ws, msg);
+    }
+  }
 }
 
 export function setupWebSocket(server: Server) {
@@ -78,7 +105,11 @@ export function setupWebSocket(server: Server) {
           rooms.set(code, room);
           currentRoom = room;
           isBillboard = true;
-          sendTo(ws, { type: "room_created", roomCode: code });
+          allBillboards.add(ws);
+
+          getGlobalLeaderboard().then((globalLeaderboard) => {
+            sendTo(ws, { type: "room_created", roomCode: code, globalLeaderboard });
+          });
           break;
         }
 
@@ -100,16 +131,20 @@ export function setupWebSocket(server: Server) {
             consent: msg.consent || false,
             shotsUsed: 0,
             totalPoints: 0,
+            goalsScored: 0,
           };
           room.mobiles.set(playerId, playerData);
 
-          sendTo(ws, {
-            type: "joined",
-            playerId,
-            roomCode: room.code,
-            maxShots: MAX_SHOTS,
-            shotsRemaining: MAX_SHOTS,
-            leaderboard: getLeaderboardArray(room),
+          getGlobalLeaderboard().then((globalLeaderboard) => {
+            sendTo(ws, {
+              type: "joined",
+              playerId,
+              roomCode: room.code,
+              maxShots: MAX_SHOTS,
+              shotsRemaining: MAX_SHOTS,
+              leaderboard: getRoomLeaderboard(room),
+              globalLeaderboard,
+            });
           });
 
           if (room.billboard) {
@@ -138,9 +173,10 @@ export function setupWebSocket(server: Server) {
           player.shotsUsed++;
           const points = msg.isGoal ? 100 : 0;
           player.totalPoints += points;
+          if (msg.isGoal) player.goalsScored++;
 
           const shotsRemaining = MAX_SHOTS - player.shotsUsed;
-          const leaderboard = getLeaderboardArray(room);
+          const roomLeaderboard = getRoomLeaderboard(room);
           const isGameOver = shotsRemaining === 0;
 
           if (room.billboard) {
@@ -155,7 +191,7 @@ export function setupWebSocket(server: Server) {
               shotNumber: player.shotsUsed,
               maxShots: MAX_SHOTS,
               totalScore: player.totalPoints,
-              leaderboard,
+              leaderboard: roomLeaderboard,
             });
           }
 
@@ -167,32 +203,66 @@ export function setupWebSocket(server: Server) {
             shotsRemaining,
             shotNumber: player.shotsUsed,
             maxShots: MAX_SHOTS,
-            leaderboard,
+            leaderboard: roomLeaderboard,
           });
 
           if (isGameOver) {
-            setTimeout(() => {
-              sendTo(ws, {
-                type: "game_over",
-                totalScore: player.totalPoints,
-                leaderboard: getLeaderboardArray(room),
-              });
-
-              if (room.billboard) {
-                sendTo(room.billboard, {
-                  type: "player_finished",
-                  playerId: currentPlayerId,
+            const pid = currentPlayerId;
+            setTimeout(async () => {
+              try {
+                await storage.saveGameScore({
                   playerName: player.playerName,
-                  totalScore: player.totalPoints,
-                  leaderboard: getLeaderboardArray(room),
+                  mobile: player.mobile || null,
+                  province: player.province || null,
+                  totalPoints: player.totalPoints,
+                  shotsScored: player.goalsScored,
+                  totalShots: MAX_SHOTS,
                 });
+
+                const globalLeaderboard = await getGlobalLeaderboard();
+
+                sendTo(ws, {
+                  type: "game_over",
+                  totalScore: player.totalPoints,
+                  leaderboard: getRoomLeaderboard(room),
+                  globalLeaderboard,
+                });
+
+                if (room.billboard) {
+                  sendTo(room.billboard, {
+                    type: "player_finished",
+                    playerId: pid,
+                    playerName: player.playerName,
+                    totalScore: player.totalPoints,
+                    leaderboard: getRoomLeaderboard(room),
+                    globalLeaderboard,
+                  });
+                }
+
+                broadcastGlobalLeaderboard(globalLeaderboard);
+              } catch (err) {
+                console.error("Error saving game score:", err);
+                sendTo(ws, {
+                  type: "game_over",
+                  totalScore: player.totalPoints,
+                  leaderboard: getRoomLeaderboard(room),
+                });
+                if (room.billboard) {
+                  sendTo(room.billboard, {
+                    type: "player_finished",
+                    playerId: pid,
+                    playerName: player.playerName,
+                    totalScore: player.totalPoints,
+                    leaderboard: getRoomLeaderboard(room),
+                  });
+                }
               }
             }, 4500);
           }
 
           for (const [pid, mobile] of room.mobiles) {
             if (pid !== currentPlayerId) {
-              sendTo(mobile.ws, { type: "leaderboard_update", leaderboard });
+              sendTo(mobile.ws, { type: "leaderboard_update", leaderboard: roomLeaderboard });
             }
           }
           break;
@@ -204,6 +274,7 @@ export function setupWebSocket(server: Server) {
       if (!currentRoom) return;
 
       if (isBillboard) {
+        allBillboards.delete(ws);
         for (const [, mobile] of currentRoom.mobiles) {
           sendTo(mobile.ws, { type: "room_closed" });
         }

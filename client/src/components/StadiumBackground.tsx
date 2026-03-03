@@ -6,40 +6,47 @@ const CROWD_COLORS = [
   "#7A6BA5", "#5C4F82", "#8C7DB5", "#3E3768", "#9A8BBE",
   "#2E2852", "#6C5F90", "#4D4175", "#7C6DA7", "#5E5184",
   "#1B998B", "#2AA89A", "#168F81", "#23B0A2", "#0F7E72",
-  "#56042C", "#6B1040", "#451035", "#7A1A4A", "#350828",
+  "#443366", "#554488", "#332255", "#665599", "#553377",
 ];
 
-function generateCrowdRow(y: number, blockH: number, count: number, seed: number): JSX.Element[] {
+function generateCrowdBlocks(startY: number, rows: number, blockH: number, cols: number, seed: number): JSX.Element[] {
   const blocks: JSX.Element[] = [];
-  const w = 100 / count;
-  for (let i = 0; i < count; i++) {
-    const idx = (seed + i * 7 + y * 13) % CROWD_COLORS.length;
-    const opacity = 0.5 + ((seed + i * 3) % 5) * 0.1;
-    blocks.push(
-      <rect
-        key={`${y}-${i}`}
-        x={`${i * w}%`}
-        y={y}
-        width={`${w + 0.2}%`}
-        height={blockH + 0.5}
-        fill={CROWD_COLORS[idx]}
-        opacity={opacity}
-      />
-    );
+  const w = 1920 / cols;
+  for (let row = 0; row < rows; row++) {
+    for (let i = 0; i < cols; i++) {
+      const idx = (seed + i * 7 + row * 13 + (i * row) * 3) % CROWD_COLORS.length;
+      const opacity = 0.6 + ((seed + i * 3 + row * 5) % 4) * 0.1;
+      blocks.push(
+        <rect
+          key={`c-${row}-${i}`}
+          x={i * w}
+          y={startY + row * blockH}
+          width={w + 0.5}
+          height={blockH + 0.5}
+          fill={CROWD_COLORS[idx]}
+          opacity={opacity}
+        />
+      );
+    }
   }
   return blocks;
 }
 
 export default function StadiumBackground() {
-  const crowdBlocks = useMemo(() => {
-    const rows: JSX.Element[] = [];
-    const blockH = 18;
-    const cols = 50;
-    for (let row = 0; row < 10; row++) {
-      rows.push(...generateCrowdRow(row * blockH, blockH, cols, row * 17 + 3));
-    }
-    return rows;
-  }, []);
+  const crowdBlocks = useMemo(() => generateCrowdBlocks(0, 12, 30, 60, 7), []);
+
+  const goalX = 460;
+  const goalW = 1000;
+  const goalTopY = 420;
+  const goalBottomY = 870;
+  const goalH = goalBottomY - goalTopY;
+  const postW = 10;
+  const crossbarH = 10;
+
+  const netCols = 35;
+  const netRows = 16;
+  const netCellW = goalW / netCols;
+  const netCellH = goalH / netRows;
 
   return (
     <svg
@@ -57,126 +64,78 @@ export default function StadiumBackground() {
           <stop offset="0%" stopColor="#1a0e30" />
           <stop offset="100%" stopColor="#2D2050" />
         </linearGradient>
-        <linearGradient id="standLeft" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#C45B3F" />
-          <stop offset="100%" stopColor="#D47058" />
-        </linearGradient>
-        <linearGradient id="standRight" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#8DBCB0" />
-          <stop offset="100%" stopColor="#A3CEC2" />
-        </linearGradient>
-        <linearGradient id="netFade" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="rgba(255,255,255,0.15)" />
-          <stop offset="100%" stopColor="rgba(255,255,255,0.05)" />
-        </linearGradient>
       </defs>
 
-      <rect width="1920" height="180" fill="url(#skyGrad)" />
+      <rect width="1920" height="360" fill="url(#skyGrad)" />
 
-      <g transform="translate(0, 0)">
-        {crowdBlocks}
-      </g>
+      <g>{crowdBlocks}</g>
 
-      <rect x="0" y="180" width="560" height="350" fill="url(#standLeft)" opacity="0.85" />
-      <rect x="1360" y="180" width="560" height="350" fill="url(#standRight)" opacity="0.85" />
+      <rect x="0" y="360" width="460" height="200" fill="#C45B3F" opacity="0.75" />
+      <rect x="1460" y="360" width="460" height="200" fill="#8DBCB0" opacity="0.75" />
+      <rect x="460" y="360" width="1000" height="200" fill="#4A3D6E" opacity="0.3" />
 
-      <rect x="560" y="180" width="800" height="350" fill="#3D3566" opacity="0.4" />
+      <rect x="0" y="530" width="1920" height="550" fill="url(#pitchGrad)" />
 
-      <rect x="0" y="480" width="1920" height="600" fill="url(#pitchGrad)" />
-
-      {Array.from({ length: 12 }).map((_, i) => (
+      {Array.from({ length: 10 }).map((_, i) => (
         <rect
           key={`stripe-${i}`}
           x="0"
-          y={480 + i * 50}
+          y={530 + i * 55}
           width="1920"
-          height="50"
-          fill={i % 2 === 0 ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)"}
+          height="55"
+          fill={i % 2 === 0 ? "rgba(255,255,255,0.025)" : "rgba(0,0,0,0.025)"}
         />
       ))}
 
-      <line x1="0" y1="520" x2="1920" y2="520" stroke="rgba(255,255,255,0.2)" strokeWidth="2" />
+      <line x1="0" y1="555" x2="1920" y2="555" stroke="rgba(255,255,255,0.15)" strokeWidth="2" />
 
-      <rect x="760" y="490" width="400" height="2" fill="rgba(255,255,255,0.15)" />
-      <rect x="760" y="490" width="2" height="60" fill="rgba(255,255,255,0.15)" />
-      <rect x="1158" y="490" width="2" height="60" fill="rgba(255,255,255,0.15)" />
+      <rect x="760" y="535" width="400" height="1.5" fill="rgba(255,255,255,0.12)" />
+      <rect x="760" y="535" width="1.5" height="50" fill="rgba(255,255,255,0.12)" />
+      <rect x="1159" y="535" width="1.5" height="50" fill="rgba(255,255,255,0.12)" />
 
-      <circle cx="960" cy="490" r="40" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="1.5" />
+      <rect x={goalX} y={goalTopY} width={goalW} height={goalH} fill="rgba(60,40,80,0.35)" rx="2" />
 
-      <rect x="560" y="530" width="800" height="6" fill="white" opacity="0.8" rx="1" />
-      <rect x="560" y="530" width="6" height="420" fill="white" opacity="0.8" rx="1" />
-      <rect x="1354" y="530" width="6" height="420" fill="white" opacity="0.8" rx="1" />
-
-      <rect x="565" y="535" width="790" height="415" fill="url(#netFade)" />
-      {Array.from({ length: 30 }).map((_, i) => (
+      {Array.from({ length: netCols + 1 }).map((_, i) => (
         <line
-          key={`vnet-${i}`}
-          x1={565 + i * 26.5}
-          y1="535"
-          x2={565 + i * 26.5}
-          y2="950"
-          stroke="rgba(255,255,255,0.08)"
+          key={`vn-${i}`}
+          x1={goalX + i * netCellW}
+          y1={goalTopY}
+          x2={goalX + i * netCellW}
+          y2={goalBottomY}
+          stroke="rgba(255,255,255,0.18)"
           strokeWidth="1"
         />
       ))}
-      {Array.from({ length: 16 }).map((_, i) => (
+      {Array.from({ length: netRows + 1 }).map((_, i) => (
         <line
-          key={`hnet-${i}`}
-          x1="565"
-          y1={535 + i * 26}
-          x2="1355"
-          y2={535 + i * 26}
-          stroke="rgba(255,255,255,0.08)"
+          key={`hn-${i}`}
+          x1={goalX}
+          y1={goalTopY + i * netCellH}
+          x2={goalX + goalW}
+          y2={goalTopY + i * netCellH}
+          stroke="rgba(255,255,255,0.18)"
           strokeWidth="1"
         />
       ))}
 
-      <line x1="565" y1="530" x2="680" y2="400" stroke="white" strokeWidth="3" opacity="0.5" />
-      <line x1="1355" y1="530" x2="1240" y2="400" stroke="white" strokeWidth="3" opacity="0.5" />
-      <line x1="680" y1="400" x2="1240" y2="400" stroke="white" strokeWidth="3" opacity="0.5" />
+      <rect x={goalX - postW / 2} y={goalTopY - crossbarH / 2} width={goalW + postW} height={crossbarH} fill="white" rx="4" />
+      <rect x={goalX - postW / 2} y={goalTopY} width={postW} height={goalH} fill="white" rx="3" />
+      <rect x={goalX + goalW - postW / 2} y={goalTopY} width={postW} height={goalH} fill="white" rx="3" />
 
-      {Array.from({ length: 22 }).map((_, i) => {
-        const x1 = 680 + i * 25.5;
-        const x2Ratio = (x1 - 565) / (1355 - 565);
-        const x2 = 565 + x2Ratio * 790;
-        return (
-          <line
-            key={`dnet-v-${i}`}
-            x1={x1}
-            y1="400"
-            x2={x2}
-            y2="530"
-            stroke="rgba(255,255,255,0.06)"
-            strokeWidth="1"
-          />
-        );
-      })}
-      {Array.from({ length: 5 }).map((_, i) => {
-        const y = 400 + i * 26;
-        const ratio = i / 5;
-        const lx = 680 - ratio * (680 - 565);
-        const rx = 1240 + ratio * (1355 - 1240);
-        return (
-          <line
-            key={`dnet-h-${i}`}
-            x1={lx}
-            y1={y}
-            x2={rx}
-            y2={y}
-            stroke="rgba(255,255,255,0.06)"
-            strokeWidth="1"
-          />
-        );
-      })}
+      <rect x={goalX - postW / 2} y={goalTopY - crossbarH / 2} width={goalW + postW} height={crossbarH} fill="rgba(255,255,255,0.3)" rx="4" />
 
-      {[0.1, 0.3, 0.5, 0.7, 0.9].map((pos, i) => (
-        <circle
+      <rect x={goalX + 2} y={goalTopY + 2} width={postW - 4} height={goalH - 4} fill="rgba(200,200,200,0.1)" />
+      <rect x={goalX + goalW - postW + 2} y={goalTopY + 2} width={postW - 4} height={goalH - 4} fill="rgba(200,200,200,0.1)" />
+
+      {[0.15, 0.35, 0.5, 0.65, 0.85].map((pos, i) => (
+        <ellipse
           key={`light-${i}`}
           cx={1920 * pos}
-          cy="30"
-          r="80"
+          cy="50"
+          rx="100"
+          ry="60"
           fill="white"
-          opacity="0.04"
+          opacity="0.03"
         />
       ))}
     </svg>

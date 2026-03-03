@@ -312,6 +312,21 @@ export default function BillboardScreen() {
                 exit={{ opacity: 0 }}
               >
                 <div className="text-center max-w-2xl">
+                  <div className="flex items-center justify-center gap-6 mb-3">
+                    <div className="h-px flex-1 bg-gradient-to-r from-transparent to-[#D4A843]/40" />
+                    <p className="text-[#D4A843] text-2xl tracking-[0.3em]" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+                      3 SHOTS TO WIN
+                    </p>
+                    <div className="h-px flex-1 bg-gradient-to-l from-transparent to-[#D4A843]/40" />
+                  </div>
+                  <motion.p
+                    className="text-white/50 text-xl tracking-[0.2em] mb-4"
+                    style={{ fontFamily: "'Bebas Neue', sans-serif" }}
+                    animate={{ opacity: [0.4, 0.7, 0.4] }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                  >
+                    PRIZES AWARDED EVERY 2 HOURS
+                  </motion.p>
                   <motion.h1
                     className="text-[8rem] leading-none tracking-[0.05em] text-white"
                     style={{ fontFamily: "'Bebas Neue', sans-serif" }}
@@ -320,21 +335,6 @@ export default function BillboardScreen() {
                   >
                     SCAN TO <span className="fifa-gradient-text">PLAY</span>
                   </motion.h1>
-                  <div className="flex items-center justify-center gap-6 mt-4">
-                    <div className="h-px flex-1 bg-gradient-to-r from-transparent to-[#D4A843]/40" />
-                    <p className="text-[#D4A843] text-2xl tracking-[0.3em]" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
-                      3 SHOTS TO WIN
-                    </p>
-                    <div className="h-px flex-1 bg-gradient-to-l from-transparent to-[#D4A843]/40" />
-                  </div>
-                  <motion.p
-                    className="text-white/40 text-xl tracking-[0.2em] mt-3"
-                    style={{ fontFamily: "'Bebas Neue', sans-serif" }}
-                    animate={{ opacity: [0.3, 0.6, 0.3] }}
-                    transition={{ duration: 3, repeat: Infinity }}
-                  >
-                    PRIZES AWARDED EVERY 2 HOURS
-                  </motion.p>
                 </div>
               </motion.div>
             )}

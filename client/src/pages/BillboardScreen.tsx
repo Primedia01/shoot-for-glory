@@ -338,21 +338,13 @@ export default function BillboardScreen() {
                     <div className="h-px flex-1 bg-gradient-to-l from-transparent to-[#D4A843]/40" />
                   </div>
                   <motion.p
-                    className="text-white/50 text-xl tracking-[0.2em] mb-4"
+                    className="text-white/50 text-xl tracking-[0.2em]"
                     style={{ fontFamily: "'Bebas Neue', sans-serif" }}
                     animate={{ opacity: [0.4, 0.7, 0.4] }}
                     transition={{ duration: 3, repeat: Infinity }}
                   >
                     PRIZES AWARDED EVERY 2 HOURS
                   </motion.p>
-                  <motion.h1
-                    className="text-[8rem] leading-none tracking-[0.05em] text-white"
-                    style={{ fontFamily: "'Bebas Neue', sans-serif" }}
-                    animate={{ opacity: [0.7, 1, 0.7] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  >
-                    SCAN TO <span className="fifa-gradient-text">PLAY</span>
-                  </motion.h1>
                 </div>
               </motion.div>
             )}

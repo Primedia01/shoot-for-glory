@@ -145,7 +145,11 @@ export default function BillboardScreen() {
 
   return (
     <div className="h-screen w-full text-white overflow-hidden relative bg-[#1a0e30]">
-      <StadiumBackground />
+      <StadiumBackground
+        leftPanel={{ text: "SPONSOR 1", bgColor: "#C45B3F" }}
+        rightPanel={{ text: "SPONSOR 2", bgColor: "#8DBCB0" }}
+        adBoardSponsors={["COCA-COLA", "ADIDAS", "VISA", "HYUNDAI", "QATAR AIRWAYS", "HISENSE", "VIVO"]}
+      />
 
       <div className="absolute inset-0 pointer-events-none" style={{
         background: "linear-gradient(180deg, rgba(26,14,48,0.7) 0%, transparent 25%, transparent 75%, rgba(0,0,0,0.4) 100%)"

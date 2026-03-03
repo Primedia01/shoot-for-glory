@@ -324,7 +324,7 @@ export default function BillboardScreen() {
             {shotStatus === "idle" && roomCode && playerCount === 0 && (
               <motion.div
                 key="scan"
-                className="absolute inset-0 flex items-center justify-center pointer-events-none z-[10]"
+                className="absolute top-4 left-0 right-0 flex justify-center pointer-events-none z-[10]"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}

@@ -4,10 +4,10 @@ import { Trophy, Users, Gift } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import GoalCelebration from "@/components/GoalCelebration";
 import Goalie from "@/components/Goalie";
+import StadiumBackground from "@/components/StadiumBackground";
 
 type GoalieState = "idle" | "ready" | "diving-left" | "diving-right" | "celebrate";
 
-const stadiumBg = "/stadium-bg.jpg";
 const soccerBall = "/soccer-ball.png";
 
 type ShotStatus = "idle" | "shooting" | "goal" | "miss";
@@ -129,17 +129,11 @@ export default function BillboardScreen() {
   }, [shotStatus, billboardBallControls]);
 
   return (
-    <div className="h-screen w-full text-white overflow-hidden relative fifa-gradient-bg">
-      <div
-        className="absolute inset-0 bg-cover bg-center opacity-30"
-        style={{ backgroundImage: `url(${stadiumBg})` }}
-      />
+    <div className="h-screen w-full text-white overflow-hidden relative bg-[#1a0e30]">
+      <StadiumBackground />
 
       <div className="absolute inset-0 pointer-events-none" style={{
-        background: "radial-gradient(ellipse at 50% 120%, rgba(212,168,67,0.08) 0%, transparent 60%)"
-      }} />
-      <div className="absolute inset-0 pointer-events-none" style={{
-        background: "linear-gradient(180deg, rgba(86,4,44,0.6) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.8) 100%)"
+        background: "linear-gradient(180deg, rgba(26,14,48,0.7) 0%, transparent 25%, transparent 75%, rgba(0,0,0,0.4) 100%)"
       }} />
 
       <div className="absolute top-0 left-0 right-0 h-[3px] z-50" style={{
@@ -269,20 +263,6 @@ export default function BillboardScreen() {
         </div>
 
         <div className="flex-1 flex flex-col items-center justify-end pb-16 relative">
-          <div className="absolute bottom-8 w-[850px] h-[340px] rounded-t-xl overflow-hidden">
-            <div className="absolute inset-0 border-t-[6px] border-x-[6px] border-white/60 rounded-t-xl z-[2]" />
-            <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent" />
-            <div
-              className="w-full h-full opacity-20"
-              style={{
-                backgroundImage:
-                  "linear-gradient(45deg, #fff 1px, transparent 1px), linear-gradient(-45deg, #fff 1px, transparent 1px)",
-                backgroundSize: "24px 24px",
-              }}
-            />
-            <div className="absolute bottom-0 left-0 right-0 h-2 bg-white/10" />
-          </div>
-
           <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-[5]">
             <Goalie state={goalieState} scale={1.4} jerseyColor="#56042C" jerseyAccent="#3a0220" jerseyText="SPONSOR" />
           </div>
